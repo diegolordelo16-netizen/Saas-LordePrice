@@ -1,0 +1,2896 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Lord Profit v14 | Precificação Inteligente</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --bg-primary: #050508; --bg-secondary: #0d0d14; --bg-tertiary: #161622; --bg-card: rgba(22, 22, 34, 0.6); --bg-hover: #222233;
+            --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.15);
+            --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-muted: #64748b;
+            --neon-cyan: #06b6d4; --neon-pink: #ec4899; --neon-purple: #8b5cf6; --neon-green: #10b981; --neon-orange: #f97316; --neon-yellow: #eab308;
+            --accent-shopee: #ee4d2d; --accent-mercado: #ffe600; --accent-tiktok: #ff0050; --accent-shein: #ffffff; --accent-temu: #fb7701;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+            --gradient-lord: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+            /* Variável de Tema Dinâmico para a Plataforma */
+            --plat-color: #ee4d2d; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
+
+        .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 15% 50%, rgba(6,182,212,0.08) 0%, transparent 40%), radial-gradient(circle at 85% 30%, rgba(139,92,246,0.08) 0%, transparent 40%), radial-gradient(circle at 50% 90%, rgba(236,72,153,0.05) 0%, transparent 40%); pointer-events: none; z-index: 0; filter: blur(40px); }
+        .grid-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 30px 30px; pointer-events: none; z-index: 0; opacity: 0.5; }
+
+        .app-container { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+        .sidebar { width: 280px; background: rgba(13, 13, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-right: 1px solid var(--border); padding: 1.75rem 1.5rem; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 5px 0 25px rgba(0,0,0,0.2); }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 4px; }
+
+        .brand { display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        .brand-icon { width: 48px; height: 48px; background: var(--gradient-lord); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 0 20px rgba(6,182,212,0.4); color: white; }
+        .brand h1 { font-size: 1.25rem; font-weight: 800; background: var(--gradient-lord); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; margin-bottom: -2px; }
+        .brand span { font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.8; }
+
+        .nav-section { margin-bottom: 2rem; }
+        .nav-title { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.2em; font-weight: 800; margin-bottom: 1rem; padding-left: 0.5rem; }
+
+        .nav-item { display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem; border-radius: 12px; color: var(--text-secondary); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; background: transparent; width: 100%; text-align: left; margin-bottom: 0.4rem; }
+        .nav-item i { font-size: 1.1rem; opacity: 0.7; transition: opacity 0.3s; }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); transform: translateX(4px); }
+        .nav-item:hover i { opacity: 1; color: var(--plat-color); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%); color: #fff; border-left: 3px solid var(--plat-color); }
+        .nav-item.active i { opacity: 1; color: var(--plat-color); }
+
+        .platform-selector { display: flex; flex-direction: column; gap: 0.6rem; }
+        .platform-card { display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .platform-card:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.04); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .platform-card.active { background: var(--bg-tertiary); }
+
+        .platform-card.shopee.active { border-color: var(--accent-shopee); box-shadow: 0 0 15px rgba(238,77,45,0.2); }
+        .platform-card.mercado.active { border-color: var(--accent-mercado); box-shadow: 0 0 15px rgba(255,230,0,0.15); }
+        .platform-card.tiktok.active { border-color: var(--accent-tiktok); box-shadow: 0 0 15px rgba(255,0,80,0.2); }
+        .platform-card.shein.active { border-color: var(--accent-shein); box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+        .platform-card.temu.active { border-color: var(--accent-temu); box-shadow: 0 0 15px rgba(251,119,1,0.2); }
+
+        .platform-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .platform-card.shopee .platform-icon { background: rgba(238,77,45,0.15); color: var(--accent-shopee); }
+        .platform-card.mercado .platform-icon { background: rgba(255,230,0,0.15); color: var(--accent-mercado); }
+        .platform-card.tiktok .platform-icon { background: rgba(255,0,80,0.15); color: var(--accent-tiktok); }
+        .platform-card.shein .platform-icon { background: rgba(255,255,255,0.1); color: #fff; }
+        .platform-card.temu .platform-icon { background: rgba(251,119,1,0.15); color: var(--accent-temu); }
+
+        .platform-name { font-weight: 700; font-size: 0.85rem; color: var(--text-primary); }
+        .platform-fee { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+        .main-content { flex: 1; margin-left: 280px; padding: 2rem; max-width: calc(100% - 280px); overflow-x: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .header h2 { font-size: 1.75rem; font-weight: 800; background: var(--gradient-lord); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+        .header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; font-weight: 500; }
+        .header-actions { display: flex; gap: 0.75rem; }
+
+        .btn { padding: 0.75rem 1.5rem; border-radius: 12px; border: none; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+        .btn i { font-size: 1rem; }
+        .btn-primary { background: var(--plat-color); color: #000; box-shadow: 0 4px 15px color-mix(in srgb, var(--plat-color) 40%, transparent); }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.2); box-shadow: 0 8px 25px color-mix(in srgb, var(--plat-color) 60%, transparent); }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border); backdrop-filter: blur(8px); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--border-hover); transform: translateY(-2px); }
+        .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; box-shadow: 0 4px 15px rgba(16,185,129,0.2); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff; box-shadow: 0 4px 15px rgba(239,68,68,0.2); }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.75rem; border-radius: 8px; }
+        .btn-excel { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; }
+        .btn-excel:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); transform: translateY(-2px); }
+
+        .card { background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 1.5rem; transition: all 0.3s ease; box-shadow: var(--glass-shadow); }
+        .card:hover { border-color: var(--border-hover); }
+
+        .card-plat-themed { border-color: color-mix(in srgb, var(--plat-color) 40%, transparent) !important; box-shadow: 0 0 25px color-mix(in srgb, var(--plat-color) 10%, transparent) !important; }
+
+        .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); }
+        .card-title { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; color: var(--text-primary); }
+        .card-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; font-weight: 500; }
+        .card-body { padding: 1.5rem; }
+
+        .grid { display: grid; gap: 1.25rem; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 1200px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; max-width: 100%; padding: 1rem; } }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .form-input { width: 100%; padding: 0.75rem 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 0.9rem; font-weight: 600; transition: all 0.3s; font-family: 'JetBrains Mono', monospace; }
+        .form-input:focus { outline: none; border-color: var(--plat-color); background: color-mix(in srgb, var(--plat-color) 5%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--plat-color) 20%, transparent); }
+        .form-input:read-only { opacity: 0.7; cursor: not-allowed; }
+
+        .input-group { display: flex; gap: 0.5rem; }
+        .input-addon { padding: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: var(--plat-color); font-weight: 700; min-width: 45px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; transition: color 0.3s; }
+
+        /* CORRIGIDO: Quick Stats Lado a Lado Moderno */
+        .quick-stats { display: flex; flex-wrap: nowrap; gap: 1rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .quick-stats .metric-card { flex: 1; min-width: 170px; margin-bottom: 0; }
+        .quick-stats::-webkit-scrollbar { height: 6px; }
+        .quick-stats::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+        .quick-stats::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+        .metric-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; transition: all 0.3s; backdrop-filter: blur(8px); }
+        .metric-card:hover { border-color: rgba(255,255,255,0.1); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .metric-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 0.4rem; white-space: nowrap; }
+        .metric-value { font-size: 1.3rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.5px; }
+
+        .metric-value.lord { background: var(--gradient-lord); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .metric-value.success { color: var(--success); }
+        .metric-value.warning { color: var(--warning); }
+        .metric-value.danger { color: var(--danger); }
+        .metric-value.cyan { color: var(--neon-cyan); }
+        .metric-value.purple { color: var(--neon-purple); }
+        .metric-value.pink { color: var(--neon-pink); }
+
+        .toggle-modern { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s; }
+        .toggle-switch { width: 48px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 13px; position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .toggle-switch.active { background: var(--plat-color); box-shadow: 0 0 10px color-mix(in srgb, var(--plat-color) 40%, transparent); }
+        .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .toggle-switch.active::after { transform: translateX(22px); }
+
+        .chart-container { position: relative; height: 280px; width: 100%; }
+        .chart-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem; }
+
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem; }
+        .data-table th { text-align: left; padding: 1rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.1em; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+        .data-table td { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: 'JetBrains Mono', monospace; font-weight: 500; transition: background 0.2s; }
+        .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .content-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 2px; }
+        .content-tab { padding: 0.75rem 1.25rem; background: transparent; border: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; }
+        .content-tab:hover { color: var(--text-primary); }
+        .content-tab.active { color: var(--plat-color); border-bottom-color: var(--plat-color); text-shadow: 0 0 10px color-mix(in srgb, var(--plat-color) 30%, transparent); }
+        .tab-panel { display: none; opacity: 0; }
+        .tab-panel.active { display: block; animation: slideUpFade 0.4s ease forwards; }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .status-card { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border-radius: 16px; margin-top: 1.5rem; border: 1px solid; backdrop-filter: blur(8px); transition: all 0.3s; }
+        .status-card.success { background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2); box-shadow: 0 4px 20px rgba(16,185,129,0.05); }
+        .status-card.warning { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2); box-shadow: 0 4px 20px rgba(245,158,11,0.05); }
+        .status-card.danger { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); box-shadow: 0 4px 20px rgba(239,68,68,0.05); }
+        .status-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .status-card.success .status-icon { background: rgba(16,185,129,0.15); color: var(--success); }
+        .status-card.warning .status-icon { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .status-card.danger .status-icon { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+        .badge { display: inline-flex; align-items: center; padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 0.7rem; font-weight: 800; border: 1px solid; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge-cyan { background: rgba(6,182,212,0.1); color: var(--neon-cyan); border-color: rgba(6,182,212,0.3); box-shadow: 0 0 10px rgba(6,182,212,0.2); }
+
+        .hidden { display: none !important; }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: var(--warning); }
+        .text-muted { color: var(--text-muted); }
+        .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+        /* O Cupom Fiscal Moderno e Dinâmico */
+        .cupom-fiscal { background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-tertiary) 100%); border: 2px dashed var(--plat-color); border-radius: 14px; padding: 1.5rem; font-family: 'JetBrains Mono', monospace; position: relative; box-shadow: 0 0 20px color-mix(in srgb, var(--plat-color) 15%, transparent); transition: all 0.3s ease; }
+        .cupom-fiscal::before { content: 'CUPOM FISCAL'; position: absolute; top: 12px; right: -30px; background: var(--plat-color); color: #000; padding: 4px 35px; font-size: 0.65rem; font-weight: 800; transform: rotate(45deg); letter-spacing: 1px; }
+        .cupom-header { text-align: center; border-bottom: 2px dotted rgba(255,255,255,0.15); padding-bottom: 1rem; margin-bottom: 1rem; }
+        .cupom-header h4 { font-size: 1.2rem; color: var(--plat-color); margin-bottom: 0.25rem; letter-spacing: 1px; display: flex; justify-content: center; align-items: center; gap: 0.5rem; transition: color 0.3s; }
+        .cupom-header .sku { font-size: 0.75rem; color: var(--text-muted); }
+        .cupom-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed rgba(255,255,255,0.05); font-size: 0.85rem; color: var(--text-secondary); }
+        .cupom-item:hover { background: rgba(255,255,255,0.02); }
+        .cupom-item.discount { color: #fca5a5; }
+        .cupom-item.fee { color: #fcd34d; }
+        .cupom-total { margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed var(--plat-color); display: flex; justify-content: space-between; font-size: 1rem; font-weight: 800; align-items: center; transition: border-color 0.3s; }
+        .cupom-total .value { font-size: 1.3rem; }
+
+        /* DESTAQUE VALOR FINAL CLIENTE */
+        .cupom-valor-final { margin-top: 1.5rem; padding: 1.25rem; background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(139,92,246,0.1) 100%); border: 2px solid var(--neon-cyan); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 30px rgba(6,182,212,0.3); position: relative; overflow: hidden; }
+        .cupom-valor-final::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); }
+        .cupom-valor-final .label { font-size: 0.9rem; font-weight: 800; color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 0.1em; text-shadow: 0 0 10px rgba(6,182,212,0.5); }
+        .cupom-valor-final .valor { font-size: 2rem; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(6,182,212,0.8); font-family: 'JetBrains Mono', monospace; }
+
+        .cupom-toggle { display: flex; gap: 0.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 0.25rem; border-radius: 10px; border: 1px solid var(--border); }
+        .cupom-toggle button { flex: 1; padding: 0.6rem; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.05em; }
+        .cupom-toggle button.active { background: var(--plat-color); color: #000; box-shadow: 0 4px 10px color-mix(in srgb, var(--plat-color) 40%, transparent); }
+
+        .saved-list { max-height: 500px; overflow-y: auto; padding-right: 0.5rem; }
+        .saved-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.3s; }
+        .saved-item:hover { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); transform: translateX(4px); }
+        .saved-item .info { flex: 1; }
+        .saved-item .sku { font-weight: 800; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.2rem; }
+        .saved-item .date { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .saved-item .lucro { font-family: 'JetBrains Mono', monospace; color: var(--success); font-weight: 800; font-size: 1.1rem; margin-right: 1rem; }
+
+        .historico-wrapper { overflow-x: auto; padding-bottom: 0.5rem; }
+        .historico-inner { min-width: 950px; }
+        .month-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1.2fr 1fr 1fr 1.2fr 40px; gap: 0.5rem; align-items: center; padding: 1rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s; }
+        .month-grid:hover { background: rgba(255,255,255,0.01); }
+        .month-grid.header { background: rgba(0,0,0,0.2); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; border-radius: 12px 12px 0 0; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+        .month-input { background: rgba(255,255,255,0.03); border: 1px solid transparent; border-radius: 8px; padding: 0.6rem; color: var(--text-primary); font-size: 0.85rem; width: 100%; font-family: 'JetBrains Mono', monospace; transition: all 0.3s; }
+        .month-input:focus { outline: none; border-color: var(--neon-purple); background: rgba(139,92,246,0.05); }
+        .month-total { font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; }
+
+        .growth-badge { display: inline-flex; align-items: center; justify-content: center; gap: 0.2rem; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; white-space: nowrap; width: fit-content; }
+        .growth-positive { background: rgba(16,185,129,0.15); color: var(--success); }
+        .growth-negative { background: rgba(239,68,68,0.15); color: var(--danger); }
+        .growth-neutral { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+
+        .status-container { display: flex; gap: 0.4rem; align-items: center; }
+        .month-status { background: rgba(255,255,255,0.03); border: 1px solid transparent; color: var(--text-secondary); border-radius: 8px; padding: 0.5rem; font-size: 0.75rem; font-weight: 600; outline:none; transition: all 0.3s; cursor: pointer; }
+        .month-status:focus { border-color: var(--neon-cyan); }
+        .month-dia { width: 50px; padding: 0.5rem; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: var(--text-primary); border-radius: 8px; font-size: 0.75rem; text-align: center; font-weight: 600; transition: all 0.3s; }
+        .month-dia:focus { border-color: var(--neon-cyan); }
+        .month-dia.hidden { display: none; }
+        .btn-delete-month { background: transparent; color: var(--text-muted); border: none; border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; flex-shrink: 0; font-size: 1.1rem; }
+        .btn-delete-month:hover { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+        .afiliado-section { background: linear-gradient(135deg, rgba(139,92,246,0.05) 0%, rgba(236,72,153,0.05) 100%); border: 1px solid rgba(139,92,246,0.2); border-radius: 16px; padding: 1.5rem; margin-top: 1rem; }
+        .be-highlight { background: linear-gradient(135deg, rgba(245,158,11,0.05) 0%, rgba(249,115,22,0.05) 100%); border: 1px solid rgba(245,158,11,0.2); }
+        .be-highlight .metric-value { color: var(--warning); }
+
+        .simulador-preco-section { background: linear-gradient(135deg, color-mix(in srgb, var(--plat-color) 5%, transparent) 0%, rgba(0,0,0,0.2) 100%); border: 1px solid color-mix(in srgb, var(--plat-color) 30%, transparent); border-radius: 20px; padding: 2rem; box-shadow: inset 0 0 40px rgba(0,0,0,0.2); transition: all 0.3s; }
+
+        .resultado-simulacao { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 2rem; margin-top: 1.5rem; position: relative; overflow: hidden; }
+        .resultado-simulacao::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+        .resultado-simulacao.lucro::before { background: var(--success); box-shadow: 0 0 15px var(--success); }
+        .resultado-simulacao.prejuizo::before { background: var(--danger); box-shadow: 0 0 15px var(--danger); }
+        .resultado-simulacao.neutro::before { background: var(--warning); box-shadow: 0 0 15px var(--warning); }
+
+        .pdf-export-list { max-height: 350px; overflow-y: auto; margin-bottom: 1.5rem; padding-right: 0.5rem; }
+        .pdf-export-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s; }
+        .pdf-export-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+        .pdf-export-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--plat-color); cursor: pointer; }
+        .pdf-export-item label { flex: 1; cursor: pointer; }
+        .pdf-export-item .sku { font-weight: 800; color: var(--text-primary); font-size: 0.95rem; }
+        .pdf-export-item .lucro { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 1.05rem; }
+
+        .cupom-highlight { font-weight: 800; color: var(--text-primary); background: rgba(255,255,255,0.05); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1); margin-top: 1rem; align-items: center;}
+
+        /* Alertas Específicos das Plataformas */
+        .platform-alert { padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-primary); display: flex; gap: 1rem; align-items: flex-start; line-height: 1.5; font-weight: 500; }
+        .platform-alert i { font-size: 1.4rem; margin-top: 2px; }
+        .platform-alert strong { font-weight: 800; letter-spacing: 0.02em; }
+
+        .sp-alert { background: linear-gradient(90deg, rgba(238,77,45,0.15) 0%, rgba(238,77,45,0.02) 100%); border-left: 4px solid var(--accent-shopee); }
+        .sp-alert i, .sp-alert strong { color: #ff6b4a; }
+
+        .ml-alert { background: linear-gradient(90deg, rgba(255,230,0,0.15) 0%, rgba(255,230,0,0.02) 100%); border-left: 4px solid var(--accent-mercado); }
+        .ml-alert i, .ml-alert strong { color: var(--accent-mercado); }
+
+        .tk-alert { background: linear-gradient(90deg, rgba(255,0,80,0.15) 0%, rgba(255,0,80,0.02) 100%); border-left: 4px solid var(--accent-tiktok); }
+        .tk-alert i, .tk-alert strong { color: #ff2a6d; }
+
+        .sh-alert { background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%); border-left: 4px solid var(--accent-shein); }
+        .sh-alert i, .sh-alert strong { color: var(--accent-shein); }
+
+        .tm-alert { background: linear-gradient(90deg, rgba(251,119,1,0.15) 0%, rgba(251,119,1,0.02) 100%); border-left: 4px solid var(--accent-temu); }
+        .tm-alert i, .tm-alert strong { color: #ff912a; }
+
+        /* Toast fix */
+        .toast { position: fixed; top: 24px; right: 24px; padding: 1rem 1.5rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 15px 40px rgba(0,0,0,0.4); z-index: 9999; animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 0.75rem; border: 1px solid rgba(255,255,255,0.1); }
+        .toast i { font-size: 1.2rem; }
+        .toast.success { background: rgba(16,185,129,0.95); color: #fff; backdrop-filter: blur(8px); }
+        .toast.error { background: rgba(239,68,68,0.95); color: #fff; backdrop-filter: blur(8px); }
+        @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* ESTILOS PRODUÇÃO */
+        .producao-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        @media (max-width: 1024px) { .producao-grid { grid-template-columns: 1fr; } }
+
+        .producao-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+        .producao-card h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .producao-card h4 i { color: var(--plat-color); }
+
+        .perda-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+        .perda-box span { font-size: 0.8rem; color: #fca5a5; font-weight: 600; }
+        .perda-box strong { color: var(--danger); font-size: 1.1rem; font-family: 'JetBrains Mono', monospace; }
+
+        .producao-total-box { background: linear-gradient(135deg, rgba(6,182,212,0.1) 0%, rgba(139,92,246,0.1) 100%); border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 1.5rem; text-align: center; margin-top: 1rem; }
+        .producao-total-box .label { font-size: 0.75rem; color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; margin-bottom: 0.5rem; }
+        .producao-total-box .valor { font-size: 2rem; color: #fff; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 20px rgba(6,182,212,0.5); }
+
+        .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(0,0,0,0.2); position: relative; overflow: hidden; }
+        .upload-area:hover { border-color: var(--plat-color); background: color-mix(in srgb, var(--plat-color) 5%, transparent); }
+        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .upload-area i { font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .upload-area p { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+        .upload-preview { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-top: 1rem; display: none; }
+        .upload-preview.active { display: block; }
+
+        .produto-foto-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+
+        .impressao-ordem { background: #fff; color: #000; padding: 2rem; border-radius: 8px; font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; }
+        .impressao-ordem h2 { text-align: center; border-bottom: 2px solid #000; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .impressao-ordem .info-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .impressao-ordem .foto-grande { width: 100%; max-height: 300px; object-fit: contain; border: 1px solid #ddd; margin: 1.5rem 0; }
+        .impressao-ordem .destaque { font-size: 1.5rem; font-weight: bold; text-align: center; margin-top: 1rem; padding: 1rem; background: #f0f0f0; border: 2px solid #000; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #modalImpressao, #modalImpressao * { visibility: visible; }
+            #modalImpressao { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: white; z-index: 99999; display: flex !important; align-items: center; justify-content: center; }
+            .impressao-ordem { box-shadow: none; }
+            .no-print { display: none !important; }
+        }
+
+        /* ========== SISTEMA DE LICENÇA - USOS RESTANTES ========== */
+        .usos-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(6,182,212,0.1);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .usos-badge:hover {
+            background: rgba(6,182,212,0.2);
+            transform: scale(1.05);
+        }
+
+        .usos-badge.bloqueado {
+            background: rgba(239,68,68,0.2);
+            border-color: rgba(239,68,68,0.5);
+            color: var(--danger);
+            cursor: not-allowed;
+        }
+
+        .usos-badge.alerta {
+            background: rgba(245,158,11,0.2);
+            border-color: rgba(245,158,11,0.5);
+            color: var(--warning);
+            animation: pulseAlerta 1.5s infinite;
+        }
+
+        @keyframes pulseAlerta {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* MODAL BLOQUEIO */
+        .modal-bloqueio {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 100000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .modal-bloqueio.active {
+            display: flex;
+        }
+
+        .modal-bloqueio i {
+            font-size: 5rem;
+            color: var(--danger);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-bloqueio h2 {
+            font-size: 2rem;
+            color: var(--danger);
+            margin-bottom: 1rem;
+        }
+
+        .modal-bloqueio p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 400px;
+        }
+
+        .reset-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .reset-section input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .reset-section input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        /* Modal Venda */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; max-width: 500px; width: 90%; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+</style>
+<base target="_blank">
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="grid-overlay"></div>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                <div><h1>LORD PROFIT</h1><span>v14 Premium Edition</span></div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-title">Plataforma Ativa</div>
+                <div class="platform-selector">
+                    <div class="platform-card shopee active" onclick="setPlatform('shopee')">
+                        <div class="platform-icon"><i class="fas fa-shopping-bag"></i></div>
+                        <div class="platform-info">
+                            <div class="platform-name">Shopee</div>
+                            <div class="platform-fee">14-20% + R$ 4,00</div>
+                        </div>
+                    </div>
+                    <div class="platform-card mercado" onclick="setPlatform('mercado')">
+                        <div class="platform-icon"><i class="fas fa-handshake"></i></div>
+                        <div class="platform-info">
+                            <div class="platform-name">Mercado Livre</div>
+                            <div class="platform-fee">14-19% + Escalonada (&lt;79)</div>
+                        </div>
+                    </div>
+                    <div class="platform-card tiktok" onclick="setPlatform('tiktok')">
+                        <div class="platform-icon"><i class="fab fa-tiktok"></i></div>
+                        <div class="platform-info">
+                            <div class="platform-name">TikTok Shop</div>
+                            <div class="platform-fee">6% + R$ 4,00</div>
+                        </div>
+                    </div>
+                    <div class="platform-card shein" onclick="setPlatform('shein')">
+                        <div class="platform-icon"><i class="fas fa-tshirt"></i></div>
+                        <div class="platform-info">
+                            <div class="platform-name">Shein</div>
+                            <div class="platform-fee">16% comissão</div>
+                        </div>
+                    </div>
+                    <div class="platform-card temu" onclick="setPlatform('temu')">
+                        <div class="platform-icon"><i class="fas fa-box"></i></div>
+                        <div class="platform-info">
+                            <div class="platform-name">Temu</div>
+                            <div class="platform-fee">15% comissão</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-title">Módulos do Sistema</div>
+                <button class="nav-item active" onclick="showSection('precificacao', this)"><i class="fas fa-brain"></i> Inteligência de Preço</button>
+                <button class="nav-item" onclick="showSection('simulador_preco', this)"><i class="fas fa-calculator"></i> Laboratório de Preços</button>
+                <button class="nav-item" onclick="showSection('simulador', this)"><i class="fas fa-chart-line"></i> Simulador & Meta Ads</button>
+                <button class="nav-item" onclick="showSection('producao', this)"><i class="fas fa-cut"></i> Custo de Produção</button>
+                <button class="nav-item" onclick="showSection('historico', this)"><i class="fas fa-history"></i> Performance</button>
+                <button class="nav-item" onclick="showSection('salvos', this)"><i class="fas fa-folder-open"></i> Arquivo Salvo</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="header">
+                <div><h2 id="pageTitle"><i class="fas fa-brain"></i> Inteligência de Preço</h2><p id="pageSubtitle">Cálculo reverso exato com análise de margem e Break-Even</p></div>
+                <div class="header-actions">
+                    <div class="usos-badge" id="badgeUsos" onclick="mostrarInfoLicenca()">
+                        <i class="fas fa-key"></i>
+                        <span>Usos: <span id="usosRestantesDisplay">10</span></span>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="salvarCalculo()"><i class="fas fa-bookmark"></i> Salvar Snapshot</button>
+                    <button class="btn btn-excel" onclick="exportarExcelDRE()"><i class="fas fa-file-excel"></i> Excel</button>
+                    <button class="btn btn-primary" onclick="calcularTudo()"><i class="fas fa-bolt"></i> Processar Dados</button>
+                </div>
+            </div>
+
+            <div id="section-precificacao" class="section-content">
+                <div class="quick-stats">
+                    <div class="metric-card"><div class="metric-label">Preço Vitrine</div><div class="metric-value cyan mono" id="quickVitrine">-</div></div>
+                    <div class="metric-card"><div class="metric-label">Preço de Venda</div><div class="metric-value lord mono" id="quickFinal">-</div></div>
+                    <div class="metric-card"><div class="metric-label">Lucro Líquido Base</div><div class="metric-value success mono" id="quickLucroSem">-</div></div>
+                    <div class="metric-card"><div class="metric-label">Lucro c/ Afiliado</div><div class="metric-value purple mono" id="quickLucroCom">-</div></div>
+                    <div class="metric-card be-highlight"><div class="metric-label"><i class="fas fa-exclamation-triangle"></i> Ponto de Equilíbrio</div><div class="metric-value warning mono" id="quickBE">-</div></div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card card-plat-themed" id="configCardPrecificacao">
+                        <div class="card-header"><div><div class="card-title" id="configTitlePrecificacao"><i class="fas fa-sliders-h"></i> Setups Shopee</div><div class="card-subtitle">Parâmetros Oficiais</div></div><span class="badge badge-cyan">v14</span></div>
+                        <div class="card-body">
+
+                            <div id="spAlertPrecificacao" class="platform-alert sp-alert hidden">
+                                <i class="fas fa-shopping-bag"></i>
+                                <div>
+                                    <strong>Modo Shopee:</strong> Comissão (até 20%) e Taxa Fixa (R$ 4,00) aplicadas automaticamente. O frete grátis do comprador é subsidiado pelo programa oficial da plataforma já embutido na taxa máxima.
+                                </div>
+                            </div>
+
+                            <div id="mlAlertPrecificacao" class="platform-alert ml-alert hidden">
+                                <i class="fas fa-bolt"></i>
+                                <div>
+                                    <strong>Modo Mercado Livre:</strong> Taxa fixa calculada automaticamente. Lembre-se: se o preço passar de <strong>R$ 79</strong>, a plataforma zera a taxa fixa, mas o frete vira responsabilidade do vendedor.
+                                </div>
+                            </div>
+
+                            <div id="tkAlertPrecificacao" class="platform-alert tk-alert hidden">
+                                <i class="fab fa-tiktok"></i>
+                                <div>
+                                    <strong>Atualização TikTok Shop:</strong> Comissão base ajustada para 6% e tarifa fixa de <strong>R$ 4,00</strong> aplicada em todos os itens (sem isenção abaixo de R$ 79).
+                                </div>
+                            </div>
+
+                            <div id="shAlertPrecificacao" class="platform-alert sh-alert hidden">
+                                <i class="fas fa-tshirt"></i>
+                                <div>
+                                    <strong>Modo Shein:</strong> Comissão de 16% fixada. Custos de frete variam conforme as campanhas da plataforma (isento de taxa fixa extra por item).
+                                </div>
+                            </div>
+
+                            <div id="tmAlertPrecificacao" class="platform-alert tm-alert hidden">
+                                <i class="fas fa-box"></i>
+                                <div>
+                                    <strong>Modo Temu:</strong> Desconto/comissão base de 15% aplicado. O preço final é calculado automaticamente sem taxa fixa adicional.
+                                </div>
+                            </div>
+
+                            <div class="form-group"><label class="form-label"><i class="fas fa-barcode"></i> SKU</label><input type="text" class="form-input mono" id="produtoSKU" value="PROD-001" placeholder="Ex: VEST-MIDI-PRETO"/></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-tag"></i> Nome do Produto</label><input type="text" class="form-input" id="produtoNome" value="Vestido Midi Premium" placeholder="Ex: Vestido Midi Estampado"/></div>
+                            <div class="grid grid-2">
+                                <div class="form-group"><label class="form-label">Custo do Produto (R$)</label><input type="number" class="form-input mono" id="lordCusto" value="38" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Markup Desejado (%)</label><div class="input-group"><input type="number" class="form-input mono" id="lordMarkup" value="70" step="0.01" oninput="calcularLord()"/><span class="input-addon">%</span></div></div>
+                                <div class="form-group"><label class="form-label">Gordura Vitrine (%)</label><div class="input-group"><input type="number" class="form-input mono" id="lordVitrineDesc" value="40" step="0.01" oninput="calcularLord()"/><span class="input-addon">%</span></div></div>
+                                <div class="form-group" id="wrapTipoConta"><label class="form-label">Status da Conta</label><select class="form-input" id="lordTipoConta" onchange="calcularLord()"><option value="CNPJ">🏢 CNPJ Oficial</option><option value="CPF_450+">👤 CPF > 450 pedidos (+R$ 3)</option><option value="CPF_450-">👤 CPF &lt; 450 pedidos</option></select></div>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="form-label" style="margin-bottom:1rem; font-size:0.75rem;"><i class="fas fa-sliders-h"></i> Ajustes de Custo e Plataforma</div>
+                            <div class="grid grid-3">
+                                <div class="form-group"><label class="form-label" id="labelComissaoLord">Comissão %</label><input type="number" class="form-input mono" id="lordComissao" value="20" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label" id="labelTaxaFixaLord">Taxa Fixa R$</label><input type="number" class="form-input mono" id="lordTaxaFixa" value="4" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Imposto DAS %</label><input type="number" class="form-input mono" id="lordImposto" value="4" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Ads Fácil %</label><input type="number" class="form-input mono" id="lordAdsFacil" value="0" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Oferta Flash %</label><input type="number" class="form-input mono" id="lordOferta" value="5" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Cupom Loja %</label><input type="number" class="form-input mono" id="lordCupom" value="5" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Prog. Afiliado %</label><input type="number" class="form-input mono" id="lordAfiliado" value="10" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Embalagem R$</label><input type="number" class="form-input mono" id="lordEmbalagem" value="2" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Frete Vendedor R$</label><input type="number" class="form-input mono" id="lordFreteCusto" value="8" step="0.01" oninput="calcularLord()"/></div>
+                                <div class="form-group"><label class="form-label">Frete Cliente R$</label><input type="number" class="form-input mono" id="lordFreteCliente" value="8" step="0.01" oninput="calcularLord()"/></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-plat-themed">
+                        <div class="card-header"><div class="card-title"><i class="fas fa-receipt"></i> Demonstrativo de Venda</div></div>
+                        <div class="card-body">
+                            <div class="cupom-toggle">
+                                <button class="active" onclick="setCupomMode('sem')" id="btnCupomSem">Cenário Padrão</button>
+                                <button onclick="setCupomMode('com')" id="btnCupomCom">Cenário c/ Afiliado</button>
+                            </div>
+                            <div class="cupom-fiscal" id="cupomPrincipal">
+                                <div class="cupom-header"><h4 id="cupomPlatName"><i id="cupomIcon" class="fas fa-shopping-bag"></i> SHOPEE</h4><div class="sku cupom-sku">SKU: PROD-001</div></div>
+                                <div class="cupom-item"><span>Preço Cheio (Vitrine)</span><span class="cupom-base">R$ 0,00</span></div>
+                                <div class="cupom-item discount"><span>↓ Desconto Fictício</span><span class="cupom-desc-vitrine">-R$ 0,00</span></div>
+                                <div class="cupom-item discount"><span>↓ Oferta Relâmpago</span><span class="cupom-oferta">-R$ 0,00</span></div>
+                                <div class="cupom-item discount"><span>↓ Cupom Aplicado</span><span class="cupom-cupom">-R$ 0,00</span></div>
+                                <div class="cupom-item"><span>+ Frete Pago pelo Cliente</span><span class="cupom-frete-cliente" style="color:var(--success);">+R$ 0,00</span></div>
+                                <div class="divider" style="margin:0.75rem 0;"></div>
+
+                                <div class="cupom-item fee row-comissao"><span>⚡ Comissão Plataforma</span><span class="cupom-comissao">-R$ 0,00</span></div>
+                                <div class="cupom-item fee row-taxafixa"><span>⚡ Taxa Fixa Transação</span><span class="cupom-taxafixa">-R$ 0,00</span></div>
+                                <div class="cupom-item fee row-ads"><span>📢 Ads Fácil (Automático)</span><span class="cupom-ads">-R$ 0,00</span></div>
+
+                                <div class="cupom-item fee"><span>📄 Imposto Simples (DAS)</span><span class="cupom-imposto">-R$ 0,00</span></div>
+                                <div class="cupom-item fee"><span>📦 Custo da Peça (CMV)</span><span class="cupom-custo">-R$ 0,00</span></div>
+                                <div class="cupom-item fee"><span>🚚 Custo de Logística</span><span class="cupom-frete">-R$ 0,00</span></div>
+                                <div class="cupom-item fee"><span>🎁 Embalagem & Brindes</span><span class="cupom-embalagem">-R$ 0,00</span></div>
+                                <div class="cupom-item fee row-afiliado" style="display:none;"><span>👤 Repasse Afiliado/Creator</span><span class="cupom-afiliado">-R$ 0,00</span></div>
+                                <div class="cupom-total"><span>LUCRO LÍQUIDO</span><span class="value cupom-lucro">R$ 0,00</span></div>
+
+                                <!-- VALOR FINAL CLIENTE DESTACADO -->
+                                <div class="cupom-valor-final">
+                                    <div>
+                                        <div class="label"><i class="fas fa-wallet"></i> Valor Final Cliente</div>
+                                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 0.25rem;">Total a pagar no checkout</div>
+                                    </div>
+                                    <div class="valor cupom-valor-final-cliente">R$ 0,00</div>
+                                </div>
+                            </div>
+                            <div class="status-card" id="lordStatusCard" style="margin-top:1rem;">
+                                <div class="status-icon"><i class="fas fa-heartbeat"></i></div>
+                                <div><div style="font-weight:800; font-size:0.875rem; margin-bottom:0.2rem; text-transform:uppercase; letter-spacing:0.05em;">Saúde do Anúncio</div><div style="font-size:0.8rem; color:var(--text-secondary);" id="lordStatusText">Calcule para analisar...</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:1rem;">
+                    <div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i> Distribuição de Custos</div></div>
+                    <div class="card-body">
+                        <div class="chart-grid">
+                            <div class="chart-container"><canvas id="precoPieChart"></canvas></div>
+                            <div class="chart-container"><canvas id="precoBarChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:1rem;">
+                    <div class="card-header"><div class="card-title"><i class="fas fa-users"></i> Impacto da Estratégia de Afiliados</div></div>
+                    <div class="card-body">
+                        <div class="grid grid-4">
+                            <div class="metric-card"><div class="metric-label">Comissão Paga</div><div class="metric-value pink mono" id="afiliadoValor">-</div></div>
+                            <div class="metric-card"><div class="metric-label">Queda no Lucro</div><div class="metric-value danger mono" id="afiliadoReducao">-</div></div>
+                            <div class="metric-card"><div class="metric-label">Multiplier Necessário</div><div class="metric-value warning mono" id="afiliadoBreakEven">-</div></div>
+                            <div class="metric-card"><div class="metric-label">Diagnóstico</div><div class="metric-value mono" id="afiliadoStatus">-</div></div>
+                        </div>
+                        <div class="afiliado-section">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div><div style="font-weight:800; font-size:0.875rem; margin-bottom:0.25rem; text-transform:uppercase;">Lucratividade Real</div><div style="font-size:0.85rem; color:var(--text-secondary);">Orgânico: <span id="afiliadoOrg" class="mono text-success" style="font-weight:700;">R$ 0,00</span> &nbsp;|&nbsp; Via Creator: <span id="afiliadoCrea" class="mono" style="color:var(--neon-purple); font-weight:700;">R$ 0,00</span></div></div>
+                                <div style="text-align:right;"><div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; font-weight:800;">Custo de Aquisição (CPA)</div><div class="mono text-danger" style="font-weight:800; font-size:1.2rem;" id="compDiferenca">-</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:1rem;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-file-invoice-dollar"></i> Auditoria DRE Unitária</div>
+                        <button class="btn btn-excel btn-sm" onclick="exportarExcelDRE()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+                    </div>
+                    <div class="card-body" style="padding:0;"><table class="data-table" id="tabelaDetalhes"><thead><tr><th>Descrição da Linha</th><th>Valor Absoluto</th><th>Impacto (%)</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <div id="section-simulador_preco" class="section-content hidden">
+                <div class="simulador-preco-section">
+                    <div class="card-header" style="margin-bottom:1.5rem; border:none; padding:0;">
+                        <div>
+                            <div class="card-title" style="font-size:1.5rem;"><i class="fas fa-flask"></i> Laboratório de Preços</div>
+                            <div class="card-subtitle" style="font-size:0.9rem;">Insira o preço de prateleira e descubra a margem exata que sobrará.</div>
+                        </div>
+                        <button class="btn btn-excel" onclick="exportarExcelSimulacao()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+                    </div>
+
+                    <div class="grid grid-2">
+                        <div class="card" style="background: rgba(0,0,0,0.2);">
+                            <div class="card-header"><div class="card-title"><i class="fas fa-tag"></i> Preço na Loja</div></div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label" style="font-size:0.8rem;">Preço Final de Venda Anunciado (R$)</label>
+                                    <input type="number" class="form-input mono" id="simPrecoVenda" value="129.90" step="0.01" oninput="calcularSimuladorPreco()" style="font-size:1.2rem; padding:1rem;"/>
+                                </div>
+                                <div class="toggle-modern active" onclick="actionToggleFreteSimPreco()" style="margin-top:1.5rem;">
+                                    <div>
+                                        <div style="font-weight:700; font-size:0.9rem;">Frete por conta do Comprador</div>
+                                        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Valor recebido: R$ <span id="simFreteClienteDisplay">8,00</span></div>
+                                    </div>
+                                    <div class="toggle-switch active" id="elToggleFreteSimPreco"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card card-plat-themed" id="configCardSimulador" style="background: rgba(0,0,0,0.2);">
+                            <div class="card-header"><div class="card-title" id="configTitleSimulador"><i class="fas fa-cog"></i> Sandbox Shopee</div></div>
+                            <div class="card-body">
+
+                                <div id="spAlertSimulador" class="platform-alert sp-alert hidden"><i class="fas fa-shopping-bag"></i><div><strong>Modo Shopee:</strong> Custos fixos e percentuais da Shopee ativos.</div></div>
+                                <div id="mlAlertSimulador" class="platform-alert ml-alert hidden"><i class="fas fa-bolt"></i><div><strong>Modo Mercado Livre:</strong> Regras de taxa fixa escalonada ativas. Cuidado com o Frete Custo ao simular acima de R$ 79!</div></div>
+                                <div id="tkAlertSimulador" class="platform-alert tk-alert hidden"><i class="fab fa-tiktok"></i><div><strong>Modo TikTok Shop:</strong> Tarifa fixa de <strong>R$ 4,00</strong> aplicada rigorosamente em todos os pedidos.</div></div>
+                                <div id="shAlertSimulador" class="platform-alert sh-alert hidden"><i class="fas fa-tshirt"></i><div><strong>Modo Shein:</strong> Cálculos focados exclusivamente na comissão de categoria.</div></div>
+                                <div id="tmAlertSimulador" class="platform-alert tm-alert hidden"><i class="fas fa-box"></i><div><strong>Modo Temu:</strong> Simulação baseada no desconto comercial de 15%.</div></div>
+
+                                <div class="grid grid-2">
+                                    <div class="form-group" id="wrapSimTipoConta"><label class="form-label">Tipo Conta</label><select class="form-input" id="simTipoConta" onchange="calcularSimuladorPreco()"><option value="CNPJ">🏢 CNPJ Oficial</option><option value="CPF_450+">👤 CPF > 450 pedidos (+R$ 3)</option><option value="CPF_450-">👤 CPF &lt; 450 pedidos</option></select></div>
+                                    <div class="form-group"><label class="form-label">Custo Peça (R$)</label><input type="number" class="form-input mono" id="simCustoProduto" value="38" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                    <div class="form-group"><label class="form-label">Embalagem (R$)</label><input type="number" class="form-input mono" id="simEmbalagem" value="2" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                    <div class="form-group"><label class="form-label">Custo Logístico (R$)</label><input type="number" class="form-input mono" id="simFreteCusto" value="8" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                    <div class="form-group"><label class="form-label">Frete Comprador (R$)</label><input type="number" class="form-input mono" id="simFreteCliente" value="8" step="0.01" oninput="atualizarFreteDisplay(); calcularSimuladorPreco()"/></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2" style="margin-top:1rem;">
+                        <div class="card" style="background: rgba(0,0,0,0.2);">
+                            <div class="card-header"><div class="card-title"><i class="fas fa-percent"></i> Taxas & Promoções Ativas</div></div>
+                            <div class="card-body">
+                                <div class="grid grid-3">
+                                    <div class="form-group"><label class="form-label">Oferta Especial %</label><input type="number" class="form-input mono" id="simOferta" value="5" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                    <div class="form-group"><label class="form-label">Cupom Carrinho %</label><input type="number" class="form-input mono" id="simCupom" value="5" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                    <div class="form-group"><label class="form-label">Ads Fácil / PAT %</label><input type="number" class="form-input mono" id="simAdsFacil" value="0" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                    <div class="form-group"><label class="form-label" id="labelComissaoSim">Comissão Base %</label><input type="number" class="form-input mono" id="simComissao" value="20" step="0.01" oninput="calcularSimuladorPreco()" readonly style="background:rgba(255,255,255,0.05);"/></div>
+                                    <div class="form-group"><label class="form-label" id="labelTaxaFixaSim">Taxa Fixa (R$)</label><input type="number" class="form-input mono" id="simTaxaFixa" value="4" step="0.01" oninput="calcularSimuladorPreco()" readonly style="background:rgba(255,255,255,0.05);"/></div>
+                                    <div class="form-group"><label class="form-label">Imposto (DAS) %</label><input type="number" class="form-input mono" id="simImposto" value="4" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                    <div class="form-group"><label class="form-label">Afiliados/Live %</label><input type="number" class="form-input mono" id="simAfiliado" value="10" step="0.01" oninput="calcularSimuladorPreco()"/></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="background: rgba(0,0,0,0.2);">
+                            <div class="card-header"><div class="card-title"><i class="fas fa-search-dollar"></i> Veredito de Viabilidade</div></div>
+                            <div class="card-body">
+                                <div id="resultadoSimulacao" class="resultado-simulacao neutro">
+                                    <div style="text-align:center; margin-bottom:1rem;">
+                                        <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; font-weight:800; letter-spacing:0.1em; margin-bottom:0.5rem;">Lucro Efetivo por Peça</div>
+                                        <div id="simResultadoValor" style="font-size:3rem; font-weight:800; font-family:'JetBrains Mono', monospace; text-shadow: 0 0 20px currentColor;">R$ 0,00</div>
+                                        <div id="simResultadoTexto" style="font-size:1.1rem; font-weight:700; margin-top:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">Aguardando Cálculo...</div>
+                                    </div>
+
+                                    <div class="divider" style="margin: 1.5rem 0; opacity: 0.3;"></div>
+
+                                    <div class="grid grid-2">
+                                        <div class="metric-card" style="background: rgba(0,0,0,0.4); border-color: rgba(6,182,212,0.2);">
+                                            <div class="metric-label" style="color: var(--neon-cyan);">Receita Bruta</div>
+                                            <div class="metric-value cyan mono" id="simReceitaTotal">R$ 0,00</div>
+                                        </div>
+                                        <div class="metric-card" style="background: rgba(0,0,0,0.4); border-color: rgba(239,68,68,0.2);">
+                                            <div class="metric-label" style="color: var(--danger);">Custo de Operação</div>
+                                            <div class="metric-value danger mono" id="simCustosTotais">R$ 0,00</div>
+                                        </div>
+                                        <div class="metric-card" style="background: rgba(0,0,0,0.4);">
+                                            <div class="metric-label">Margem Real</div>
+                                            <div class="metric-value mono" id="simMargem">0,0%</div>
+                                        </div>
+                                        <div class="metric-card" style="background: rgba(0,0,0,0.4); border-color: rgba(245,158,11,0.2);">
+                                            <div class="metric-label" style="color: var(--warning);">Linha Vermelha (Break-Even)</div>
+                                            <div class="metric-value warning mono" id="simBreakEven">R$ 0,00</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:1rem; background: rgba(0,0,0,0.2);">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-list-ul"></i> Extrato de Laboratório</div>
+                            <button class="btn btn-excel btn-sm" onclick="exportarExcelSimulacao()"><i class="fas fa-file-excel"></i> Excel</button>
+                        </div>
+                        <div class="card-body" style="padding:0;">
+                            <table class="data-table" id="tabelaSimulacao">
+                                <thead><tr><th>Lançamento</th><th>Valor Processado</th><th>Observações</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-simulador" class="section-content hidden">
+                <div class="content-tabs">
+                    <button class="content-tab active" onclick="switchTab('roas', this)">Ads & Tráfego Pago</button>
+                    <button class="content-tab" onclick="switchTab('breakeven', this)">Custo Fixo & Meta</button>
+                </div>
+
+                <div id="tab-roas" class="tab-panel active">
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <div class="card-header"><div class="card-title"><i class="fas fa-bullseye"></i> Estratégia de Investimento Ads</div></div>
+                            <div class="card-body">
+                                <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem; line-height: 1.5; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                                    Este simulador extrai o "Lucro Líquido Base" configurado na aba principal. Descubra quanto você pode gastar no Meta/TikTok Ads sem sangrar a operação da loja.
+                                </div>
+                                <div class="grid grid-2" style="margin-bottom: 1.5rem;">
+                                    <div class="form-group"><label class="form-label">Ticket da Conversão</label><input type="text" class="form-input mono" id="roasPrecoFinal" readonly style="background:rgba(255,255,255,0.02);"/></div>
+                                    <div class="form-group"><label class="form-label">Sobras para Ads (Lucro Base)</label><input type="text" class="form-input mono" id="roasLucroUnitario" readonly style="background:rgba(16,185,129,0.1); color: var(--success); border-color: var(--success);"/></div>
+                                </div>
+                                <div class="grid grid-2">
+                                    <div class="form-group"><label class="form-label">Budget Campanha (R$)</label><input type="number" class="form-input mono" id="roasInvestimento" value="500" step="1" oninput="calcularROAS()"/></div>
+                                    <div class="form-group"><label class="form-label">ROAS Retornado da Plataforma</label><input type="number" class="form-input mono" id="roasAtingido" value="6.5" step="0.1" oninput="calcularROAS()"/></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><div class="card-title"><i class="fas fa-chart-bar"></i> Performance da Campanha</div></div>
+                            <div class="card-body">
+                                <div class="grid grid-2">
+                                    <div class="metric-card" style="background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.3);"><div class="metric-label" style="color: var(--warning);">Break-Even ROAS (Zero a Zero)</div><div class="metric-value warning mono" id="roasMinimo">-</div></div>
+                                    <div class="metric-card" style="background: rgba(6,182,212,0.05); border-color: rgba(6,182,212,0.3);"><div class="metric-label" style="color: var(--neon-cyan);">Target ROAS (+50% Scale)</div><div class="metric-value cyan mono" id="roasIdeal">-</div></div>
+                                </div>
+                                <div class="grid grid-2" style="margin-top:1.5rem;">
+                                    <div class="metric-card" style="background: rgba(0,0,0,0.3);">
+                                        <div class="metric-label">Vendas Brutas (GMV)</div>
+                                        <div class="metric-value success mono" id="roasFaturamento">-</div>
+                                        <div style="font-size:0.75rem; color:var(--text-primary); margin-top:0.5rem; font-weight: 700; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 6px;" id="roasVendasQtd">0 conversões</div>
+                                    </div>
+                                    <div class="metric-card" style="background: rgba(0,0,0,0.3);">
+                                        <div class="metric-label">Lucro Efetivo (Pós-Ads)</div>
+                                        <div class="metric-value lord mono" id="roasLucroFinal" style="font-size: 1.8rem;">-</div>
+                                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.5rem; text-transform: uppercase; font-weight: 800;" id="roasCPA">CPA Real: R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-breakeven" class="tab-panel">
+                    <div class="grid grid-3">
+                        <div class="metric-card be-highlight" style="padding: 1.5rem;"><div class="metric-label">Ponto Morto do Preço</div><div class="metric-value warning mono" id="bePreco" style="font-size: 2rem;">-</div></div>
+                        <div class="metric-card" style="padding: 1.5rem;"><div class="metric-label">Despesa Fixa Mensal</div><input type="number" class="form-input mono" id="beCustoFixo" value="12000" oninput="calcularBreakEven()" style="margin-top:0.75rem; font-size: 1.2rem; text-align: center;"/></div>
+                        <div class="metric-card" style="background:linear-gradient(135deg, rgba(6,182,212,0.1) 0%, rgba(139,92,246,0.05) 100%); border-color:var(--neon-cyan); padding: 1.5rem;"><div class="metric-label" style="color: #fff;">Unidades para Pagar as Contas</div><div class="metric-value cyan mono" id="beUnidades" style="font-size: 2rem;">-</div></div>
+                    </div>
+                    <div class="card" style="margin-top:1.5rem;"><div class="card-header"><div class="card-title"><i class="fas fa-chart-line"></i> Gráfico de Equilíbrio Operacional</div></div><div class="chart-container" style="height:400px; padding: 1rem;"><canvas id="beChart"></canvas></div></div>
+                </div>
+            </div>
+
+            <!-- NOVA SEÇÃO: CUSTO DE PRODUÇÃO -->
+            <div id="section-producao" class="section-content hidden">
+                <div class="header" style="margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-size: 1.75rem; font-weight: 800; background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            <i class="fas fa-cut"></i> Controle de Produção
+                        </h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">Gestão de custos reais por lote e controle de perdas</p>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="btn btn-excel" onclick="exportarExcelProducao()"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button class="btn btn-primary" onclick="salvarProducao()">
+                            <i class="fas fa-save"></i> Salvar Lote
+                        </button>
+                    </div>
+                </div>
+
+                <div class="producao-grid">
+                    <!-- Coluna 1: Dados do Produto -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-tshirt"></i> Identificação do Lote</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">SKU do Produto</label>
+                                <input type="text" class="form-input mono" id="prodSku" placeholder="Ex: BLUSA-001"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Descrição Breve</label>
+                                <input type="text" class="form-input" id="prodDescricao" placeholder="Ex: Blusa Viscose Estampada"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Foto do Produto</label>
+                                <div class="upload-area" onclick="document.getElementById('prodFotoInput').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Clique para enviar foto</p>
+                                    <input type="file" id="prodFotoInput" accept="image/*" onchange="previewFoto(this)"/>
+                                </div>
+                                <img id="prodFotoPreview" class="upload-preview" alt="Preview"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna 2: Custos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-calculator"></i> Custos de Produção</div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Corte -->
+                            <div class="producao-card" style="margin-bottom: 1rem;">
+                                <h4><i class="fas fa-scissors"></i> Corte</h4>
+                                <div class="grid grid-2">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 0.65rem;">Qtd. Peças Cortadas</label>
+                                        <input type="number" class="form-input mono" id="corteQtd" value="100" oninput="calcularProducao()"/>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 0.65rem;">Custo Unitário (R$)</label>
+                                        <input type="number" class="form-input mono" id="corteUnit" value="2.50" step="0.01" oninput="calcularProducao()"/>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.75rem; text-align: right; font-size: 0.85rem; color: var(--text-secondary);">
+                                    Total Corte: <strong id="corteTotal" style="color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">R$ 0,00</strong>
+                                </div>
+                            </div>
+
+                            <!-- Costura -->
+                            <div class="producao-card" style="margin-bottom: 1rem;">
+                                <h4><i class="fas fa-user-ninja"></i> Costura</h4>
+                                <div class="grid grid-3">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 0.65rem;">Qtd. Enviada</label>
+                                        <input type="number" class="form-input mono" id="costuraEnviada" value="100" oninput="calcularProducao()"/>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 0.65rem;">Valor Unit. (R$)</label>
+                                        <input type="number" class="form-input mono" id="costuraUnit" value="8.00" step="0.01" oninput="calcularProducao()"/>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 0.65rem;">Qtd. Retornada</label>
+                                        <input type="number" class="form-input mono" id="costuraRetornada" value="95" oninput="calcularProducao()"/>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.75rem; text-align: right; font-size: 0.85rem; color: var(--text-secondary);">
+                                    Total Costura: <strong id="costuraTotal" style="color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">R$ 0,00</strong>
+                                </div>
+                                <div id="perdaBox" class="perda-box" style="display: none;">
+                                    <span><i class="fas fa-exclamation-triangle"></i> Perda na Costura</span>
+                                    <strong id="perdaValor">0 peças</strong>
+                                </div>
+                            </div>
+
+                            <!-- Tecido e Transporte -->
+                            <div class="grid grid-2">
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-layer-group"></i> Valor Total Tecido (R$)</label>
+                                    <input type="number" class="form-input mono" id="tecidoValor" value="500" step="0.01" oninput="calcularProducao()"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-truck"></i> Transporte (R$)</label>
+                                    <input type="number" class="form-input mono" id="transporteValor" value="50" step="0.01" oninput="calcularProducao()"/>
+                                </div>
+                            </div>
+
+                            <div class="producao-total-box">
+                                <div class="label">Custo Total do Lote</div>
+                                <div class="valor" id="producaoTotalGeral">R$ 0,00</div>
+                                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+                                    Custo por peça final: <strong id="custoPorPeca" style="color: var(--success); font-size: 1.1rem;">R$ 0,00</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Histórico -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-table"></i> Histórico de Produção</div>
+                        <button class="btn btn-excel btn-sm" onclick="exportarExcelProducao()"><i class="fas fa-file-excel"></i> Excel</button>
+                    </div>
+                    <div class="card-body" style="padding: 0; overflow-x: auto;">
+                        <table class="data-table" id="tabelaProducao">
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>SKU</th>
+                                    <th>Descrição</th>
+                                    <th>Corte (Qtd/Unit/Total)</th>
+                                    <th>Costura (Env/Ret/Perda)</th>
+                                    <th>Tecido</th>
+                                    <th>Transp.</th>
+                                    <th>Custo Total</th>
+                                    <th>Custo/Pç</th>
+                                    <th>Estoque</th>
+                                    <th>Vendas</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="producaoTableBody">
+                                <!-- Preenchido via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-historico" class="section-content hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div><div class="card-title"><i class="fas fa-chart-bar"></i> Performance Histórica</div><div class="card-subtitle">Controle de tração de visitas, vendas e escala</div></div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button class="btn btn-excel" onclick="exportarExcelHistorico()"><i class="fas fa-file-excel"></i> Excel</button>
+                            <button class="btn btn-primary" onclick="adicionarMes()"><i class="fas fa-calendar-plus"></i> Novo Mês</button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding:0;">
+                        <div class="historico-wrapper">
+                            <div class="historico-inner">
+                                <div class="month-grid header">
+                                    <div>Referência</div>
+                                    <div>Tráfego (Sessões)</div>
+                                    <div>Pedidos (Qtd)</div>
+                                    <div>GMV (Receita)</div>
+                                    <div>Margem Final</div>
+                                    <div>Resultado (Caixa)</div>
+                                    <div>MoM Growth</div>
+                                    <div>Fechamento</div>
+                                    <div></div>
+                                </div>
+                                <div id="historicoContainer">
+                                    <div class="month-grid item-row">
+                                        <input type="text" class="month-input nome-mes" value="Março 2026"/>
+                                        <input type="number" class="month-input mono visitas-input" value="15800" oninput="calcularHistorico()"/>
+                                        <input type="number" class="month-input mono volume-input" value="460" oninput="calcularHistorico()"/>
+                                        <input type="number" class="month-input mono vendas-input" value="45900" oninput="calcularHistorico()"/>
+                                        <div class="input-group">
+                                            <input type="number" class="month-input mono margem-input" value="18" step="0.1" oninput="calcularHistorico()"/>
+                                            <span class="input-addon">%</span>
+                                        </div>
+                                        <div class="month-total mono">-</div>
+                                        <div class="growth-badge growth-neutral">-</div>
+                                        <div class="status-container">
+                                            <select class="month-status" onchange="toggleDiaInput(this); calcularHistorico();">
+                                                <option value="parcial" selected>Em Curso</option>
+                                                <option value="completo">Fechado</option>
+                                            </select>
+                                            <input type="number" class="month-dia" placeholder="Dia" min="1" max="31" value="24" oninput="calcularHistorico()"/>
+                                        </div>
+                                        <button class="btn-delete-month" onclick="removerMes(this)"><i class="fas fa-times"></i></button>
+                                    </div>
+
+                                    <div class="month-grid item-row" style="opacity: 0.8;">
+                                        <input type="text" class="month-input nome-mes" value="Fevereiro 2026"/>
+                                        <input type="number" class="month-input mono visitas-input" value="18500" oninput="calcularHistorico()"/>
+                                        <input type="number" class="month-input mono volume-input" value="510" oninput="calcularHistorico()"/>
+                                        <input type="number" class="month-input mono vendas-input" value="49800" oninput="calcularHistorico()"/>
+                                        <div class="input-group">
+                                            <input type="number" class="month-input mono margem-input" value="17.5" step="0.1" oninput="calcularHistorico()"/>
+                                            <span class="input-addon">%</span>
+                                        </div>
+                                        <div class="month-total mono">-</div>
+                                        <div class="growth-badge">-</div>
+                                        <div class="status-container">
+                                            <select class="month-status" onchange="toggleDiaInput(this); calcularHistorico();">
+                                                <option value="completo" selected>Fechado</option>
+                                                <option value="parcial">Em Curso</option>
+                                            </select>
+                                            <input type="number" class="month-dia hidden" placeholder="Dia" min="1" max="31" value="28" oninput="calcularHistorico()"/>
+                                        </div>
+                                        <button class="btn-delete-month" onclick="removerMes(this)"><i class="fas fa-times"></i></button>
+                                    </div>
+
+                                    <div class="month-grid item-row" style="opacity: 0.6;">
+                                        <input type="text" class="month-input nome-mes" value="Janeiro 2026"/>
+                                        <input type="number" class="month-input mono visitas-input" value="14200" oninput="calcularHistorico()"/>
+                                        <input type="number" class="month-input mono volume-input" value="420" oninput="calcularHistorico()"/>
+                                        <input type="number" class="month-input mono vendas-input" value="38500" oninput="calcularHistorico()"/>
+                                        <div class="input-group">
+                                            <input type="number" class="month-input mono margem-input" value="16.8" step="0.1" oninput="calcularHistorico()"/>
+                                            <span class="input-addon">%</span>
+                                        </div>
+                                        <div class="month-total mono">-</div>
+                                        <div class="growth-badge">-</div>
+                                        <div class="status-container">
+                                            <select class="month-status" onchange="toggleDiaInput(this); calcularHistorico();">
+                                                <option value="completo" selected>Fechado</option>
+                                                <option value="parcial">Em Curso</option>
+                                            </select>
+                                            <input type="number" class="month-dia hidden" placeholder="Dia" min="1" max="31" value="31" oninput="calcularHistorico()"/>
+                                        </div>
+                                        <button class="btn-delete-month" onclick="removerMes(this)"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:1.5rem;"><div class="card-header"><div class="card-title"><i class="fas fa-chart-area"></i> Forecasting Predictivo (6 Meses)</div></div><div class="card-body"><div class="chart-container" style="height:350px; padding: 1rem;"><canvas id="projecaoChart"></canvas></div></div></div>
+            </div>
+
+            <div id="section-salvos" class="section-content hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div><div class="card-title"><i class="fas fa-folder-open"></i> Arquivos de Precificação</div><div class="card-subtitle">Seus setups salvos na memória do navegador</div></div>
+                        <div style="display:flex; gap: 0.75rem;">
+                            <button class="btn btn-excel btn-sm" onclick="exportarExcelPrecificacoes()"><i class="fas fa-file-excel"></i> Excel</button>
+                            <button class="btn btn-secondary btn-sm" onclick="abrirModalPDF()"><i class="fas fa-print"></i> PDF</button>
+                            <button class="btn btn-danger btn-sm" onclick="limparSalvos()"><i class="fas fa-dumpster"></i> Limpar</button>
+                        </div>
+                    </div>
+                    <div class="card-body"><div class="saved-list" id="savedList"><div style="text-align:center; padding:4rem; color:var(--text-muted);"><i class="fas fa-folder-open" style="font-size:3rem; margin-bottom:1rem; opacity:0.3;"></i><p style="font-size:0.9rem; font-weight:600;">O arquivo está vazio no momento.</p></div></div></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Impressão Ordem de Costura -->
+    <div id="modalVenda" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shopping-cart"></i> Registrar Venda</h3>
+                <button class="modal-close" onclick="fecharModalVenda()">&times;</button>
+            </div>
+            <div style="padding:1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Quantidade</label>
+                    <input type="number" id="vendaQuantidade" class="form-input" value="1" min="1"/>
+                </div>
+                <button class="btn btn-primary" onclick="confirmarVenda()" style="width:100%;">
+                    <i class="fas fa-check"></i> Confirmar Venda
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalImpressao" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; overflow-y:auto;">
+        <div style="max-width:600px; margin:2rem auto; position:relative;">
+            <button onclick="fecharImpressao()" class="no-print" style="position:absolute; top:-40px; right:0; background:var(--danger); color:#fff; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer; font-weight:700;">
+                <i class="fas fa-times"></i> Fechar
+            </button>
+            <button onclick="window.print()" class="no-print" style="position:absolute; top:-40px; right:80px; background:var(--success); color:#fff; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer; font-weight:700;">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+            <div id="conteudoImpressao" class="impressao-ordem">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="modalPDF" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5,5,8,0.9); z-index:10000; justify-content:center; align-items:center; backdrop-filter: blur(10px);">
+        <div style="background:var(--bg-secondary); border:1px solid var(--border); border-radius:24px; padding:2.5rem; max-width:550px; width:90%; max-height:85vh; overflow-y:auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <h3 style="font-size:1.3rem; font-weight:800;"><i class="fas fa-file-pdf" style="color:var(--danger); margin-right:0.75rem;"></i>Gerador de Relatórios</h3>
+                <button onclick="fecharModalPDF()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.4rem; transition: color 0.2s;"><i class="fas fa-times"></i></button>
+            </div>
+            <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1.5rem; font-weight: 500;">Selecione os setups estratégicos que deseja consolidar em PDF:</p>
+            <div class="pdf-export-list" id="pdfExportList">
+                <div style="text-align:center; padding:3rem; color:var(--text-muted);">
+                    <i class="fas fa-inbox" style="font-size:2.5rem; margin-bottom:1rem; opacity:0.3;"></i>
+                    <p style="font-size:0.9rem; font-weight: 600;">Sem registros para exportar.</p>
+                    <p style="font-size:0.75rem; margin-top:0.5rem; opacity: 0.8;">Salve um cálculo na aba principal primeiro.</p>
+                </div>
+            </div>
+            <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button class="btn btn-secondary" onclick="selecionarTodosPDF()" style="flex:1; justify-content: center;"><i class="fas fa-check-double"></i> Selecionar Tudo</button>
+                <button class="btn btn-primary" onclick="exportarPDFSelecionados()" style="flex:2; justify-content: center;"><i class="fas fa-cloud-download-alt"></i> Gerar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        let currentPlatform = 'shopee', charts = {}, mesesCounter = 2, cupomMode = 'sem';
+        let savedCalculations = JSON.parse(localStorage.getItem('lordProfit_v14') || '[]');
+        let lastCalculo = null;
+        let pdfSelecionados = new Set();
+        let producoes = JSON.parse(localStorage.getItem('lordProfit_producao_v14') || '[]');
+        let fotoAtual = null;
+        let vendaProducaoId = null;
+
+        function initCharts() {
+            Chart.defaults.color = '#cbd5e1';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.font.size = 11;
+
+            const pieCtx1 = document.getElementById('precoPieChart');
+            if (pieCtx1) {
+                charts.precoPie = new Chart(pieCtx1, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Lucro', 'Impostos', 'Taxas Plat.', 'Custo Produto', 'Afiliado'],
+                        datasets: [{
+                            data: [0, 0, 0, 0, 0],
+                            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#ec4899'],
+                            borderWidth: 2,
+                            borderColor: '#161622',
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#f8fafc', padding: 15 } } }, cutout: '75%' }
+                });
+            }
+
+            const barCtx1 = document.getElementById('precoBarChart');
+            if (barCtx1) {
+                charts.precoBar = new Chart(barCtx1, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Receita Bruta', 'Despesas Operac.', 'Lucro Final'],
+                        datasets: [{
+                            label: 'Valor (R$)',
+                            data: [0, 0, 0],
+                            backgroundColor: ['#06b6d4', '#ef4444', '#10b981'],
+                            borderRadius: 8,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,13,20,0.9)', titleColor: '#fff', bodyColor: '#fff', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
+                });
+            }
+
+            const beCtx = document.getElementById('beChart');
+            if (beCtx) {
+                charts.be = new Chart(beCtx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [
+                        { label: 'Receita Total', data: [], borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.3, borderWidth: 3 },
+                        { label: 'Custo Total Operacional', data: [], borderColor: '#ef4444', backgroundColor: 'transparent', tension: 0.3, borderWidth: 3 },
+                        { label: 'Ponto de Equilíbrio', data: [], borderColor: '#f59e0b', pointRadius: 6, pointBackgroundColor: '#f59e0b', pointBorderColor: '#fff', pointBorderWidth: 2, showLine: false }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                });
+            }
+
+            const projCtx = document.getElementById('projecaoChart');
+            if (projCtx) {
+                charts.projecao = new Chart(projCtx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [
+                        { label: 'Expectativa de Lucro', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.15)', fill: true, tension: 0.4, borderWidth: 3, pointBackgroundColor: '#8b5cf6', pointRadius: 4 }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                });
+            }
+        }
+
+        function getShopeeTaxas(preco, tipoConta) {
+            let percentual, taxaFixa, subsidioPix;
+            if (preco <= 79.99) { percentual = 20; taxaFixa = 4; subsidioPix = 0; } 
+            else if (preco <= 99.99) { percentual = 14; taxaFixa = 16; subsidioPix = 5; } 
+            else if (preco <= 199.99) { percentual = 14; taxaFixa = 20; subsidioPix = 5; } 
+            else if (preco <= 499.99) { percentual = 14; taxaFixa = 26; subsidioPix = 5; }
+            else { percentual = 14; taxaFixa = 26; subsidioPix = 8; }
+
+            if (tipoConta === 'CPF_450+') { taxaFixa += 3; }
+            return { percentual, taxaFixa, subsidioPix };
+        }
+
+        const PLATFORM_DATA = {
+            shopee: { nome: 'Shopee', cor: '#ee4d2d', comissao: 20, taxaFixa: 4 },
+            mercado: { nome: 'Mercado Livre', cor: '#ffe600', comissao: 19, taxaFixa: 6.75 },
+            tiktok: { nome: 'TikTok Shop', cor: '#ff0050', comissao: 6, taxaFixa: 4 },
+            shein: { nome: 'Shein', cor: '#ffffff', comissao: 16, taxaFixa: 0 },
+            temu: { nome: 'Temu', cor: '#fb7701', comissao: 15, taxaFixa: 0 }
+        };
+
+        function getTaxasPlataforma(plataforma, preco, tipoConta, comissaoBase, taxaFixaBase) {
+            if (plataforma === 'shopee') {
+                return getShopeeTaxas(preco, tipoConta); 
+            }
+
+            let percentual = comissaoBase;
+            let taxaFixa = taxaFixaBase;
+            let subsidioPix = 0;
+
+            if (plataforma === 'mercado') {
+                if (preco >= 79) {
+                    taxaFixa = 0; 
+                } else {
+                    if (preco < 12.50) {
+                        taxaFixa = 0;
+                        percentual = 50; 
+                    } else if (preco <= 29.00) {
+                        taxaFixa = 6.25;
+                    } else if (preco <= 50.00) {
+                        taxaFixa = 6.50;
+                    } else {
+                        taxaFixa = 6.75; 
+                    }
+                }
+            }
+
+            return { percentual, taxaFixa, subsidioPix };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initLicenca();
+            if(typeof initCharts === 'function') initCharts();
+            calcularLord();
+            calcularHistorico();
+            calcularSimuladorPreco();
+            renderSavedList();
+            renderProducoes();
+            calcularProducao();
+        });
+
+        function showSection(section, element) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`section-${section}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            const titles = {
+                precificacao: ['<i class="fas fa-brain"></i> Inteligência de Preço', 'Cálculo reverso exato com análise de margem e Break-Even'],
+                simulador_preco: ['<i class="fas fa-calculator"></i> Laboratório de Preços', 'Defina um preço fixo e extraia todas as variáveis de custo'],
+                simulador: ['<i class="fas fa-chart-line"></i> Simulador & Meta Ads', 'Projete escala, volume e simule campanhas de tráfego pago'],
+                producao: ['<i class="fas fa-cut"></i> Custo de Produção', 'Controle de custos reais de produção de roupas'],
+                historico: ['<i class="fas fa-history"></i> Performance', 'Monitoramento e forecasting estatístico das vendas'],
+                salvos: ['<i class="fas fa-folder-open"></i> Arquivo Salvo', 'Acesse seu banco de dados de precificações salvas']
+            };
+            document.getElementById('pageTitle').innerHTML = titles[section][0];
+            document.getElementById('pageSubtitle').textContent = titles[section][1];
+            if (section === 'simulador' || section === 'historico') {
+                setTimeout(() => { Object.values(charts).forEach(c => c && c.resize()); }, 150);
+            }
+        }
+
+        function setPlatform(platform) {
+            currentPlatform = platform;
+            document.querySelectorAll('.platform-card').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.platform-card.${platform}`).classList.add('active');
+            const data = PLATFORM_DATA[platform];
+
+            document.documentElement.style.setProperty('--plat-color', data.cor);
+
+            const platIcon = document.querySelector(`.platform-card.${platform} .platform-icon i`).className;
+            document.getElementById('cupomIcon').className = platIcon;
+            document.getElementById('cupomPlatName').innerHTML = `<i id="cupomIcon" class="${platIcon}"></i> ${data.nome.toUpperCase()}`;
+
+            document.getElementById('lordComissao').value = data.comissao;
+            document.getElementById('lordTaxaFixa').value = data.taxaFixa;
+            document.getElementById('simComissao').value = data.comissao;
+            document.getElementById('simTaxaFixa').value = data.taxaFixa;
+
+            const isShopee = platform === 'shopee';
+            const isMercado = platform === 'mercado';
+            const isTikTok = platform === 'tiktok';
+            const isShein = platform === 'shein';
+            const isTemu = platform === 'temu';
+
+            document.getElementById('wrapTipoConta').style.display = isShopee ? 'block' : 'none';
+            document.getElementById('wrapSimTipoConta').style.display = isShopee ? 'block' : 'none';
+
+            const alerts = ['sp', 'ml', 'tk', 'sh', 'tm'];
+            alerts.forEach(prefix => {
+                const elPrec = document.getElementById(`${prefix}AlertPrecificacao`);
+                const elSim = document.getElementById(`${prefix}AlertSimulador`);
+                let isActive = false;
+                if(prefix==='sp' && isShopee) isActive = true;
+                if(prefix==='ml' && isMercado) isActive = true;
+                if(prefix==='tk' && isTikTok) isActive = true;
+                if(prefix==='sh' && isShein) isActive = true;
+                if(prefix==='tm' && isTemu) isActive = true;
+
+                if(elPrec) elPrec.classList.toggle('hidden', !isActive);
+                if(elSim) elSim.classList.toggle('hidden', !isActive);
+            });
+
+            ['lordComissao', 'lordTaxaFixa', 'simComissao', 'simTaxaFixa'].forEach(id => {
+                const el = document.getElementById(id);
+                if (isShopee) {
+                    el.readOnly = true;
+                    el.style.background = 'rgba(255,255,255,0.05)';
+                } else if (isMercado) {
+                    if (id.includes('TaxaFixa')) {
+                        el.readOnly = true;
+                        el.style.background = 'rgba(255,255,255,0.05)';
+                    } else {
+                        el.readOnly = false;
+                        el.style.background = 'rgba(0,0,0,0.2)';
+                    }
+                } else {
+                    el.readOnly = false;
+                    el.style.background = 'rgba(0,0,0,0.2)';
+                }
+            });
+
+            const lblComissao = isShopee ? 'Comissão % <span style="font-size:0.6rem; color:var(--plat-color);">(Auto)</span>' : 'Comissão % <span style="font-size:0.6rem; color:var(--text-muted);">(Manual)</span>';
+            const lblTaxaFixa = (isShopee || isMercado) ? 'Taxa Fixa R$ <span style="font-size:0.6rem; color:var(--plat-color);">(Auto)</span>' : 'Taxa Fixa R$ <span style="font-size:0.6rem; color:var(--text-muted);">(Manual)</span>';
+
+            document.getElementById('labelComissaoLord').innerHTML = lblComissao;
+            document.getElementById('labelTaxaFixaLord').innerHTML = lblTaxaFixa;
+            document.getElementById('labelComissaoSim').innerHTML = lblComissao;
+            document.getElementById('labelTaxaFixaSim').innerHTML = lblTaxaFixa;
+
+            document.getElementById('configCardPrecificacao').className = 'card card-plat-themed';
+            document.getElementById('configCardSimulador').className = 'card card-plat-themed';
+
+            document.getElementById('configTitlePrecificacao').innerHTML = `<i class="fas fa-sliders-h"></i> Setups ${data.nome}`;
+            document.getElementById('configTitleSimulador').innerHTML = `<i class="fas fa-cog"></i> Sandbox ${data.nome}`;
+
+            calcularLord();
+            calcularSimuladorPreco();
+            showToast(`Operando em: ${data.nome}`, 'success');
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            if (tab === 'breakeven') {
+                setTimeout(() => {
+                    if (charts.be) charts.be.resize();
+                    if (tab === 'breakeven') calcularBreakEven();
+                }, 100);
+            }
+        }
+
+        function setCupomMode(mode) {
+            cupomMode = mode;
+            const btnSem1 = document.getElementById('btnCupomSem');
+            const btnCom1 = document.getElementById('btnCupomCom');
+            if(btnSem1) btnSem1.classList.toggle('active', mode === 'sem');
+            if(btnCom1) btnCom1.classList.toggle('active', mode === 'com');
+
+            document.querySelectorAll('.row-afiliado').forEach(e => e.style.display = mode === 'com' ? 'flex' : 'none');
+            if (lastCalculo) atualizarCupom(lastCalculo);
+        }
+
+        function calcularLord() {
+            const custo = parseFloat(document.getElementById('lordCusto').value) || 0;
+            const markup = parseFloat(document.getElementById('lordMarkup').value) || 0;
+            const vitrineDesc = parseFloat(document.getElementById('lordVitrineDesc').value) || 0;
+            const tipoConta = document.getElementById('lordTipoConta').value;
+
+            const oferta = parseFloat(document.getElementById('lordOferta').value) || 0;
+            const cupom = parseFloat(document.getElementById('lordCupom').value) || 0;
+            const descontosClientePct = oferta + cupom; 
+
+            const imposto = parseFloat(document.getElementById('lordImposto').value) || 0;
+            const impostoPct = imposto / 100;
+
+            const afiliado = parseFloat(document.getElementById('lordAfiliado').value) || 0;
+            const embalagem = parseFloat(document.getElementById('lordEmbalagem').value) || 0;
+
+            let freteCusto = parseFloat(document.getElementById('lordFreteCusto').value) || 0;
+            let freteCliente = parseFloat(document.getElementById('lordFreteCliente').value) || 0;
+
+            const comissaoInput = parseFloat(document.getElementById('lordComissao').value) || 0;
+            const taxaFixaInput = parseFloat(document.getElementById('lordTaxaFixa').value) || 0;
+            const adsFacil = parseFloat(document.getElementById('lordAdsFacil').value) || 0;
+
+            const isML = currentPlatform === 'mercado';
+            const taxasExtrasPct = adsFacil; 
+
+            let taxasDinamicas = { percentual: comissaoInput, taxaFixa: taxaFixaInput, subsidioPix: 0 };
+            let precoFinal = (custo + embalagem + freteCusto) * 2;
+
+            for (let i = 0; i < 15; i++) {
+                let fCusto = freteCusto;
+                let fCliente = freteCliente;
+
+                if (isML && precoFinal >= 79) {
+                    if (fCusto < 19.87) fCusto = 19.87; 
+                    fCliente = 0; 
+                }
+
+                const custoTotalLoop = custo + embalagem + fCusto; 
+                const lucroDesejado = custo * (markup / 100);
+
+                taxasDinamicas = getTaxasPlataforma(currentPlatform, precoFinal, tipoConta, comissaoInput, taxaFixaInput);
+                const taxasTotaisPct = (taxasDinamicas.percentual + taxasExtrasPct) / 100;
+
+                const den = 1 - impostoPct - taxasTotaisPct;
+                if (den <= 0) {
+                    precoFinal = custoTotalLoop * 2; 
+                } else {
+                    const num = lucroDesejado + custoTotalLoop + taxasDinamicas.taxaFixa - (fCliente * (1 - impostoPct));
+                    precoFinal = num / den;
+                }
+                if (precoFinal < 0) precoFinal = 0;
+            }
+
+            if (isML) {
+                if (precoFinal >= 79) {
+                    if (freteCusto < 19.87) freteCusto = 19.87;
+                    freteCliente = 0;
+                    document.getElementById('lordFreteCusto').value = freteCusto.toFixed(2);
+                    document.getElementById('lordFreteCliente').value = "0";
+
+                    const alertEl = document.getElementById('mlAlertPrecificacao');
+                    if(alertEl) alertEl.innerHTML = `<i class="fas fa-truck-fast"></i><div><strong>Frete Grátis Compulsório (>= R$79):</strong> O Mercado Livre isentou a taxa fixa. O sistema ajustou a Logística do Vendedor para no mínimo <strong>R$ 19,87</strong>.</div>`;
+                } else {
+                    const alertEl = document.getElementById('mlAlertPrecificacao');
+                    if(alertEl) alertEl.innerHTML = `<i class="fas fa-bolt"></i><div><strong>Modo Mercado Livre:</strong> Taxa fixa escalonada ativada. Peça abaixo de R$ 79, frete pago pelo cliente.</div>`;
+                }
+            }
+
+            const custoTotal = custo + embalagem + freteCusto; 
+            const precoBase = precoFinal / (1 - descontosClientePct/100);
+            const precoVitrine = precoBase / (1 - vitrineDesc/100);
+            const precoPixCliente = precoFinal * (1 - (taxasDinamicas.subsidioPix/100));
+            const valorFinalCliente = precoPixCliente + freteCliente;
+
+            if (currentPlatform === 'shopee') {
+                document.getElementById('lordComissao').value = taxasDinamicas.percentual; 
+                document.getElementById('lordTaxaFixa').value = taxasDinamicas.taxaFixa; 
+            } else if (currentPlatform === 'mercado') {
+                document.getElementById('lordTaxaFixa').value = taxasDinamicas.taxaFixa; 
+            }
+
+            const nf = precoFinal + freteCliente;
+            const valorImposto = nf * impostoPct;
+
+            const taxasTotaisParaCalculo = taxasDinamicas.percentual + taxasExtrasPct;
+            const valorTaxas = precoFinal * (taxasTotaisParaCalculo/100) + taxasDinamicas.taxaFixa;
+
+            const receitaTotal = precoFinal + freteCliente;
+            const lucroSem = receitaTotal - custoTotal - valorImposto - valorTaxas;
+            const comissaoAfiliado = precoFinal * (afiliado/100);
+            const lucroCom = lucroSem - comissaoAfiliado;
+            const margemSem = precoFinal > 0 ? (lucroSem / precoFinal) * 100 : 0;
+
+            const taxasPct = taxasTotaisParaCalculo / 100;
+            const numeradorBE = custoTotal + taxasDinamicas.taxaFixa - (freteCliente * (1 - impostoPct));
+            const denominadorBE = 1 - impostoPct - taxasPct;
+            let precoFinalBE = denominadorBE > 0 ? numeradorBE / denominadorBE : custoTotal * 1.05;
+            let precoBE = precoFinalBE / (1 - descontosClientePct/100);
+            if (precoBE <= custoTotal) precoBE = custoTotal * 1.05;
+
+            lastCalculo = { precoVitrine, precoBase, precoFinal, precoBE, precoPixCliente, valorFinalCliente, vitrineDesc, oferta, cupom, valorTaxas, valorImposto, custo, freteCusto, embalagem, comissaoAfiliado, lucroSem, lucroCom, nf, freteCliente, receitaTotal, comissaoFinal: taxasDinamicas.percentual, taxaFixa: taxasDinamicas.taxaFixa, taxaAdsFacil: adsFacil, subsidioPix: taxasDinamicas.subsidioPix };
+
+            document.getElementById('quickVitrine').textContent = formatMoney(precoVitrine);
+            document.getElementById('quickFinal').textContent = formatMoney(precoFinal);
+            document.getElementById('quickLucroSem').textContent = formatMoney(lucroSem);
+            document.getElementById('quickLucroCom').textContent = formatMoney(lucroCom);
+            document.getElementById('quickBE').textContent = formatMoney(precoBE);
+
+            const org = document.getElementById('afiliadoOrg');
+            const crea = document.getElementById('afiliadoCrea');
+            if (org) org.textContent = formatMoney(lucroSem);
+            if (crea) crea.textContent = formatMoney(lucroCom);
+
+            atualizarCupom(lastCalculo);
+
+            const statusCard = document.getElementById('lordStatusCard');
+            const statusText = document.getElementById('lordStatusText');
+            if (lucroSem < 0) { statusCard.className = 'status-card danger'; statusText.innerHTML = `<strong style="color:var(--danger);">PREJUÍZO TÁTICO:</strong> Operando ${formatMoney(Math.abs(lucroSem))} abaixo da linha de sobrevivência. Verifique os custos operacionais.`; }
+            else if (lucroCom < 0) { statusCard.className = 'status-card warning'; statusText.innerHTML = `<strong style="color:var(--warning);">AFILIADO INVIÁVEL:</strong> A estratégia com creators gera sangria de ${formatMoney(Math.abs(lucroCom))}.`; }
+            else if (margemSem < 15) { statusCard.className = 'status-card warning'; statusText.innerHTML = `<strong style="color:var(--warning);">ALERTA DE MARGEM (${margemSem.toFixed(1)}%):</strong> Fluxo muito estreito, risco alto em caso de devoluções.`; }
+            else { statusCard.className = 'status-card success'; statusText.innerHTML = `<strong style="color:var(--success);">OPERAÇÃO SAUDÁVEL:</strong> Excelente margem de ${margemSem.toFixed(1)}% garantindo ${formatMoney(lucroSem)} livres na conta.`; }
+
+            const reducao = lucroSem - lucroCom;
+            const breakEvenRatio = lucroCom > 0 ? (lucroSem / lucroCom).toFixed(1) : '∞';
+            const percentualReducao = lucroSem > 0 ? ((reducao / lucroSem) * 100).toFixed(1) : 0;
+
+            document.getElementById('afiliadoValor').textContent = formatMoney(comissaoAfiliado);
+            document.getElementById('afiliadoReducao').textContent = formatMoney(reducao);
+            document.getElementById('afiliadoBreakEven').textContent = breakEvenRatio + 'x';
+            document.getElementById('compDiferenca').textContent = '-' + formatMoney(reducao);
+
+            const afiliadoStatus = document.getElementById('afiliadoStatus');
+            if (lucroCom < 0) { afiliadoStatus.textContent = '❌ CANCELAR'; afiliadoStatus.className = 'metric-value danger mono'; }
+            else if (percentualReducao > 50) { afiliadoStatus.textContent = '⚠️ REVISAR CONTRATO'; afiliadoStatus.className = 'metric-value warning mono'; }
+            else { afiliadoStatus.textContent = '✅ ESCALAR REDE'; afiliadoStatus.className = 'metric-value success mono'; }
+
+            atualizarTabela({ 
+                'Receita Bruta do Produto': precoFinal, 
+                'Verba Frete Cliente': freteCliente, 
+                'Total Faturado': receitaTotal, 
+                [`Fee Plataforma (${taxasDinamicas.percentual.toFixed(1)}%)`]: precoFinal * (taxasDinamicas.percentual/100),
+                [`Taxa Transacional Fixa`]: taxasDinamicas.taxaFixa,
+                ...(adsFacil > 0 ? { [`Impulso Ads Fácil (${adsFacil}%)`]: precoFinal * (adsFacil/100) } : {}),
+                'Recolhimento DAS': valorImposto, 
+                'Custo Fabril': custo, 
+                'Logística/Envios': freteCusto, 
+                'Materiais e Embalagens': embalagem, 
+                'Resultado Efetivo (S/ Creator)': lucroSem, 
+                'Repasse para Creator': comissaoAfiliado, 
+                'Resultado Final (C/ Creator)': lucroCom 
+            }, receitaTotal);
+
+            updatePrecoCharts(receitaTotal, lucroSem, valorImposto, valorTaxas, custoTotal, comissaoAfiliado);
+            calcularROAS();
+        }
+
+        function atualizarCupom(c) {
+            document.querySelectorAll('.cupom-nome').forEach(e => e.textContent = (document.getElementById('produtoNome').value || 'Produto').toUpperCase());
+            document.querySelectorAll('.cupom-sku').forEach(e => e.textContent = 'SKU: ' + (document.getElementById('produtoSKU').value || 'PROD-001'));
+            document.querySelectorAll('.cupom-base').forEach(e => e.textContent = formatMoney(c.precoBase));
+            document.querySelectorAll('.cupom-desc-vitrine').forEach(e => e.textContent = '-' + formatMoney(c.precoVitrine - c.precoBase));
+            document.querySelectorAll('.cupom-oferta').forEach(e => e.textContent = '-' + formatMoney(c.precoFinal * (c.oferta/100)));
+            document.querySelectorAll('.cupom-cupom').forEach(e => e.textContent = '-' + formatMoney(c.precoFinal * (c.cupom/100)));
+            document.querySelectorAll('.cupom-frete-cliente').forEach(e => e.textContent = '+' + formatMoney(c.freteCliente));
+
+            const comissaoR = c.precoFinal * (c.comissaoFinal/100);
+            const adsR = c.precoFinal * (c.taxaAdsFacil/100);
+
+            document.querySelectorAll('.cupom-comissao').forEach(e => e.textContent = '-' + formatMoney(comissaoR));
+            document.querySelectorAll('.cupom-taxafixa').forEach(e => e.textContent = '-' + formatMoney(c.taxaFixa));
+
+            document.querySelectorAll('.cupom-ads').forEach(e => e.textContent = '-' + formatMoney(adsR));
+            document.querySelectorAll('.row-ads').forEach(e => e.style.display = adsR > 0 ? 'flex' : 'none');
+
+            document.querySelectorAll('.cupom-imposto').forEach(e => e.textContent = '-' + formatMoney(c.valorImposto));
+            document.querySelectorAll('.cupom-custo').forEach(e => e.textContent = '-' + formatMoney(c.custo));
+            document.querySelectorAll('.cupom-frete').forEach(e => e.textContent = '-' + formatMoney(c.freteCusto));
+            document.querySelectorAll('.cupom-embalagem').forEach(e => e.textContent = '-' + formatMoney(c.embalagem));
+            document.querySelectorAll('.cupom-afiliado').forEach(e => e.textContent = '-' + formatMoney(c.comissaoAfiliado));
+
+            document.querySelectorAll('.cupom-valor-final-cliente').forEach(e => {
+                e.textContent = formatMoney(c.valorFinalCliente);
+            });
+
+            const lucroValor = cupomMode === 'sem' ? c.lucroSem : c.lucroCom;
+            document.querySelectorAll('.cupom-lucro').forEach(e => {
+                e.textContent = formatMoney(lucroValor);
+                e.style.color = lucroValor >= 0 ? 'var(--success)' : 'var(--danger)';
+            });
+        }
+
+        function atualizarTabela(dados, receita) {
+            const tbody = document.querySelector('#tabelaDetalhes tbody');
+            tbody.innerHTML = '';
+            Object.entries(dados).forEach(([item, valor]) => {
+                if (Math.abs(valor) < 0.01 && !item.includes('Resultado')) return;
+                const pct = receita > 0 ? (Math.abs(valor) / receita * 100).toFixed(1) : 0;
+                const isLucro = item.includes('Resultado');
+                const isAfiliado = item.includes('Creator');
+                let color = '';
+                if (isLucro && valor >= 0) color = 'color:var(--success);';
+                else if (isLucro && valor < 0) color = 'color:var(--danger);';
+                else if (isAfiliado) color = 'color:var(--neon-pink);';
+                const tr = document.createElement('tr');
+
+                let trStyle = isLucro ? "background: rgba(255,255,255,0.05);" : "";
+
+                tr.innerHTML = `<td style="font-weight:${isLucro?'800':'600'}; ${trStyle}">${item}</td><td style="${color} font-weight:800; ${trStyle}" class="mono">${formatMoney(valor)}</td><td class="mono" style="${trStyle}; color: var(--text-muted);">${item.includes('Total') || item.includes('Verba') ? '-' : pct + '%'}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updatePrecoCharts(receita, lucro, imposto, taxas, custo, afiliado) {
+            if (charts.precoPie) {
+                charts.precoPie.data.datasets[0].data = [Math.max(0, lucro), imposto, taxas, custo, afiliado];
+                charts.precoPie.update();
+            }
+            if (charts.precoBar) {
+                charts.precoBar.data.datasets[0].data = [receita, custo + taxas + imposto, Math.max(0, lucro)];
+                charts.precoBar.update();
+            }
+        }
+
+        function actionToggleFreteSimPreco() {
+            document.getElementById('elToggleFreteSimPreco').classList.toggle('active');
+            calcularSimuladorPreco();
+        }
+
+        function atualizarFreteDisplay() {
+            const frete = parseFloat(document.getElementById('simFreteCliente').value) || 0;
+            document.getElementById('simFreteClienteDisplay').textContent = formatMoney(frete).replace('R$ ', '');
+        }
+
+        function calcularSimuladorPreco() {
+            const precoBase = parseFloat(document.getElementById('simPrecoVenda').value) || 0; 
+            const tipoConta = document.getElementById('simTipoConta').value;
+            const custoProduto = parseFloat(document.getElementById('simCustoProduto').value) || 0;
+            const embalagem = parseFloat(document.getElementById('simEmbalagem').value) || 0;
+            let freteCusto = parseFloat(document.getElementById('simFreteCusto').value) || 0;
+            let freteCliente = parseFloat(document.getElementById('simFreteCliente').value) || 0;
+
+            const oferta = parseFloat(document.getElementById('simOferta').value) || 0;
+            const cupom = parseFloat(document.getElementById('simCupom').value) || 0;
+            const imposto = parseFloat(document.getElementById('simImposto').value) || 0;
+            const impostoPct = imposto / 100;
+            const afiliado = parseFloat(document.getElementById('simAfiliado').value) || 0;
+
+            const comissaoInput = parseFloat(document.getElementById('simComissao').value) || 0;
+            const taxaFixaInput = parseFloat(document.getElementById('simTaxaFixa').value) || 0;
+            const adsFacil = parseFloat(document.getElementById('simAdsFacil').value) || 0;
+
+            const descontosCliente = oferta + cupom;
+            const precoFinal = precoBase * (1 - descontosCliente/100);
+            const isML = currentPlatform === 'mercado';
+
+            if (isML) {
+                if (precoFinal >= 79) {
+                    if (freteCusto < 19.87) {
+                        freteCusto = 19.87;
+                        document.getElementById('simFreteCusto').value = 19.87;
+                    }
+                    const toggleEl = document.getElementById('elToggleFreteSimPreco');
+                    if (toggleEl.classList.contains('active')) {
+                        toggleEl.classList.remove('active'); 
+                    }
+                    freteCliente = 0;
+                    document.getElementById('simFreteCliente').value = "0";
+                    const alertEl = document.getElementById('mlAlertSimulador');
+                    if(alertEl) alertEl.innerHTML = `<i class="fas fa-truck-fast"></i><div><strong>Frete Grátis Ativado:</strong> Preço atingiu R$ 79. Taxa fixa zerada, frete (Mín: R$ 19,87) repassado ao vendedor.</div>`;
+                } else {
+                    const alertEl = document.getElementById('mlAlertSimulador');
+                    if(alertEl) alertEl.innerHTML = `<i class="fas fa-bolt"></i><div><strong>Modo Mercado Livre:</strong> Produto abaixo de R$ 79. Taxa fixa cobrada do lojista.</div>`;
+                }
+            }
+
+            const cobrarFrete = document.getElementById('elToggleFreteSimPreco').classList.contains('active');
+            const freteClienteRecebido = cobrarFrete ? freteCliente : 0;
+
+            const taxasExtrasPct = adsFacil;
+            const taxasDinamicas = getTaxasPlataforma(currentPlatform, precoFinal, tipoConta, comissaoInput, taxaFixaInput);
+
+            if (currentPlatform === 'shopee') {
+                document.getElementById('simComissao').value = taxasDinamicas.percentual;
+                document.getElementById('simTaxaFixa').value = taxasDinamicas.taxaFixa;
+            } else if (currentPlatform === 'mercado') {
+                document.getElementById('simTaxaFixa').value = taxasDinamicas.taxaFixa;
+            }
+
+            const receitaTotal = precoFinal + freteClienteRecebido;
+            const nf = precoFinal + freteClienteRecebido;
+            const valorImposto = nf * impostoPct;
+
+            const taxasTotaisPct = taxasDinamicas.percentual + taxasExtrasPct;
+            const valorTaxas = precoFinal * (taxasTotaisPct/100) + taxasDinamicas.taxaFixa;
+
+            const custoTotal = custoProduto + embalagem + freteCusto;
+            const lucroSem = receitaTotal - custoTotal - valorImposto - valorTaxas;
+            const comissaoAfiliado = precoFinal * (afiliado/100);
+            const lucroCom = lucroSem - comissaoAfiliado;
+            const margem = precoFinal > 0 ? (lucroSem / precoFinal) * 100 : 0;
+            const precoPixCliente = precoFinal * (1 - (taxasDinamicas.subsidioPix/100));
+
+            const taxasPct = taxasTotaisPct / 100;
+            const numeradorBE = custoTotal + taxasDinamicas.taxaFixa - (freteClienteRecebido * (1 - impostoPct));
+            const denominadorBE = 1 - impostoPct - taxasPct;
+            let precoFinalBE = denominadorBE > 0 ? numeradorBE / denominadorBE : custoTotal * 1.05;
+            let precoBE = precoFinalBE / (1 - descontosCliente/100);
+            if (precoBE <= custoTotal) precoBE = custoTotal * 1.05;
+
+            const resultadoDiv = document.getElementById('resultadoSimulacao');
+            const resultadoValor = document.getElementById('simResultadoValor');
+            const resultadoTexto = document.getElementById('simResultadoTexto');
+
+            resultadoValor.textContent = formatMoney(lucroSem);
+            document.getElementById('simReceitaTotal').textContent = formatMoney(receitaTotal);
+            document.getElementById('simCustosTotais').textContent = formatMoney(custoTotal + valorImposto + valorTaxas);
+            document.getElementById('simMargem').textContent = margem.toFixed(1) + '%';
+            document.getElementById('simMargem').style.color = margem >= 0 ? 'var(--success)' : 'var(--danger)';
+            document.getElementById('simBreakEven').textContent = formatMoney(precoBE);
+
+            if (lucroSem > 0) {
+                resultadoDiv.className = 'resultado-simulacao lucro';
+                resultadoValor.style.color = 'var(--success)';
+                resultadoTexto.textContent = '✅ ESTRATÉGIA VALIDADA!';
+                resultadoTexto.style.color = 'var(--success)';
+            } else if (lucroSem < 0) {
+                resultadoDiv.className = 'resultado-simulacao prejuizo';
+                resultadoValor.style.color = 'var(--danger)';
+                resultadoTexto.textContent = '❌ INTERROMPER: DRE NEGATIVO!';
+                resultadoTexto.style.color = 'var(--danger)';
+            } else {
+                resultadoDiv.className = 'resultado-simulacao neutro';
+                resultadoValor.style.color = 'var(--warning)';
+                resultadoTexto.textContent = '⚠️ ALERTA DE BREAK-EVEN';
+                resultadoTexto.style.color = 'var(--warning)';
+            }
+
+            const tbody = document.querySelector('#tabelaSimulacao tbody');
+            tbody.innerHTML = `
+                <tr><td>Lançamento na Plataforma</td><td class="mono" style="color:var(--text-primary); font-weight:800;">${formatMoney(precoBase)}</td><td>Preço fixado no front</td></tr>
+                <tr><td>Descontos da Loja</td><td class="mono" style="color:var(--danger);">- ${formatMoney(precoBase - precoFinal)}</td><td>Promoção + Cupom (${descontosCliente}%)</td></tr>
+                <tr style="background:rgba(255,255,255,0.05);"><td><strong>Preço Liquidação</strong></td><td class="mono" style="color:var(--plat-color); font-weight:800;">${formatMoney(precoFinal)}</td><td>Valor líquido da transação</td></tr>
+                <tr><td>Logística do Comprador</td><td class="mono" style="color:var(--success);">+ ${formatMoney(freteClienteRecebido)}</td><td>Repasse de frete recebido</td></tr>
+                <tr style="background:rgba(16,185,129,0.1);"><td style="color:var(--success);"><strong>Faturamento Bruto</strong></td><td class="mono" style="color:var(--success); font-weight:800;">${formatMoney(receitaTotal)}</td><td>Volume gerado nesta venda</td></tr>
+                <tr><td colspan="3" style="height:10px;"></td></tr>
+                <tr><td>Custo Fabril</td><td class="mono" style="color:var(--danger);">- ${formatMoney(custoProduto)}</td><td>Custo primário do produto</td></tr>
+                <tr><td>Materiais / Mimos</td><td class="mono" style="color:var(--danger);">- ${formatMoney(embalagem)}</td><td>Embalagem e envios</td></tr>
+                <tr><td>Custo Logístico</td><td class="mono" style="color:var(--danger);">- ${formatMoney(freteCusto)}</td><td>Subsídio de frete</td></tr>
+                <tr><td>Fee Plataforma</td><td class="mono" style="color:var(--danger);">- ${formatMoney(precoFinal * (taxasDinamicas.percentual/100))}</td><td>${taxasDinamicas.percentual.toFixed(1)}% ${currentPlatform !== 'shopee' ? `(Configuração = ${comissaoInput}%)` : ''}</td></tr>
+                <tr><td>Tarifa por Pedido</td><td class="mono" style="color:var(--danger);">- ${formatMoney(taxasDinamicas.taxaFixa)}</td><td>${currentPlatform !== 'shopee' ? `(Ajuste: R$ ${taxaFixaInput.toFixed(2)})` : 'Taxa de serviço'}</td></tr>
+                ${adsFacil > 0 ? `<tr><td>Injeção Ads Fácil</td><td class="mono" style="color:var(--danger);">- ${formatMoney(precoFinal * (adsFacil/100))}</td><td>${adsFacil}% comido pelo MKT</td></tr>` : ''}
+                <tr><td>Tributação (DAS)</td><td class="mono" style="color:var(--danger);">- ${formatMoney(valorImposto)}</td><td>${imposto}% de imposto governamental</td></tr>
+                <tr style="background:rgba(239,68,68,0.1);"><td style="color:var(--danger);"><strong>Custos e Despesas</strong></td><td class="mono" style="color:var(--danger); font-weight:800;">${formatMoney(custoTotal + valorImposto + valorTaxas)}</td><td>Soma de desvios e obrigações</td></tr>
+                <tr><td colspan="3" style="height:10px;"></td></tr>
+                <tr style="background:linear-gradient(90deg, rgba(16,185,129,0.3), rgba(16,185,129,0.05)); color:#fff;"><td style="font-size:1.1rem;"><strong>LUCRO (Direto)</strong></td><td class="mono" style="font-weight:800; font-size:1.1rem; color:var(--success); text-shadow: 0 0 10px rgba(16,185,129,0.5);">${formatMoney(lucroSem)}</td><td>Retorno Efetivo: ${margem.toFixed(1)}%</td></tr>
+                <tr><td>Cashback Afiliado</td><td class="mono" style="color:var(--neon-pink);">- ${formatMoney(comissaoAfiliado)}</td><td>${afiliado}% deduzido na rede</td></tr>
+                <tr style="background:linear-gradient(90deg, rgba(139,92,246,0.3), rgba(139,92,246,0.05)); border-left: 3px solid var(--neon-purple);"><td style="color:#fff; font-size:1.1rem;"><strong>LUCRO (Creator)</strong></td><td class="mono" style="font-weight:800; color:#fff; font-size:1.1rem; text-shadow: 0 0 10px rgba(139,92,246,0.5);">${formatMoney(lucroCom)}</td><td>${lucroCom >= 0 ? '<span style="color:var(--success);">✅ Parceria Liberada</span>' : '<span style="color:var(--danger);">❌ Parceria Bloqueada</span>'}</td></tr>
+            `;
+        }
+
+        function calcularROAS() {
+            if (!lastCalculo || lastCalculo.precoFinal <= 0) return;
+
+            const precoFinal = lastCalculo.precoFinal;
+            const lucroUnitario = lastCalculo.lucroSem; 
+
+            document.getElementById('roasPrecoFinal').value = formatMoney(precoFinal);
+            document.getElementById('roasLucroUnitario').value = formatMoney(lucroUnitario);
+
+            const investimento = parseFloat(document.getElementById('roasInvestimento').value) || 0;
+            const roas = parseFloat(document.getElementById('roasAtingido').value) || 0;
+
+            let roasMinimo = 0;
+            if (lucroUnitario > 0) {
+                roasMinimo = precoFinal / lucroUnitario;
+            }
+
+            const roasIdeal = roasMinimo * 1.5; 
+
+            const faturamento = investimento * roas;
+            const vendasQtd = precoFinal > 0 ? faturamento / precoFinal : 0;
+
+            const lucroTotalBruto = vendasQtd * lucroUnitario; 
+            const lucroLiquidoFinal = lucroTotalBruto - investimento;
+
+            const cpa = vendasQtd > 0 ? investimento / vendasQtd : 0;
+
+            document.getElementById('roasMinimo').textContent = roasMinimo > 0 ? roasMinimo.toFixed(2) + 'x' : 'Inválido';
+            document.getElementById('roasIdeal').textContent = roasIdeal > 0 ? roasIdeal.toFixed(2) + 'x' : 'Inválido';
+
+            document.getElementById('roasFaturamento').textContent = formatMoney(faturamento);
+            document.getElementById('roasVendasQtd').textContent = `${Math.floor(vendasQtd)} Conversões`;
+
+            const elLucroFinal = document.getElementById('roasLucroFinal');
+            elLucroFinal.textContent = formatMoney(lucroLiquidoFinal);
+            elLucroFinal.className = `metric-value mono ${lucroLiquidoFinal >= 0 ? 'lord' : 'danger'}`;
+
+            document.getElementById('roasCPA').textContent = `Custo por Aquisição: ${formatMoney(cpa)}`;
+        }
+
+        function calcularBreakEven() {
+            const preco = parseFloat(document.getElementById('simPrecoVenda').value) || 100;
+            const custo = parseFloat(document.getElementById('simCustoProduto').value) || 48;
+            const custoFixo = parseFloat(document.getElementById('beCustoFixo').value) || 5000;
+            const freteCliente = document.getElementById('elToggleFreteSimPreco').classList.contains('active') ? (parseFloat(document.getElementById('simFreteCliente').value) || 8) : 0;
+            const custoProduto = custo;
+            const impostoPercentual = 0.04;
+
+            const data = PLATFORM_DATA[currentPlatform];
+            const comissaoInput = parseFloat(document.getElementById('lordComissao').value) || data.comissao;
+            const taxaFixaInput = parseFloat(document.getElementById('lordTaxaFixa').value) || data.taxaFixa;
+            const tipoConta = document.getElementById('lordTipoConta').value;
+
+            let precoBE = (custoProduto + taxaFixaInput - (freteCliente * (1 - impostoPercentual))) / (1 - impostoPercentual - (comissaoInput/100));
+            for (let i = 0; i < 5; i++) {
+                const taxasDinamicas = getTaxasPlataforma(currentPlatform, precoBE, tipoConta, comissaoInput, taxaFixaInput);
+                const numerador = custoProduto + taxasDinamicas.taxaFixa - (freteCliente * (1 - impostoPercentual));
+                const denominador = 1 - impostoPercentual - (taxasDinamicas.percentual/100);
+                precoBE = denominador > 0 ? numerador / denominador : custoProduto * 1.05;
+            }
+            if (precoBE <= custoProduto) precoBE = custoProduto * 1.05;
+
+            const taxasDinamicas = getTaxasPlataforma(currentPlatform, precoBE, tipoConta, comissaoInput, taxaFixaInput);
+            const nfBE = precoBE + freteCliente;
+            const impostoBE = nfBE * impostoPercentual;
+            const taxasBE = precoBE * (taxasDinamicas.percentual/100) + taxasDinamicas.taxaFixa;
+            const custoTotalBE = custoProduto + impostoBE + taxasBE;
+            const margemContribuicao = precoBE - custoTotalBE + freteCliente;
+            let unidades = margemContribuicao > 0 ? Math.ceil(custoFixo / margemContribuicao) : 0;
+
+            document.getElementById('bePreco').textContent = formatMoney(precoBE);
+            document.getElementById('beUnidades').textContent = unidades > 0 ? `${unidades.toLocaleString()} Pçs` : '-';
+            updateBEChart(precoBE, preco, custoFixo, custoProduto, taxasDinamicas.taxaFixa, taxasDinamicas.percentual/100, impostoPercentual, freteCliente);
+        }
+
+        function updateBEChart(precoBE, precoAtual, custoFixo, custoVar, taxaFixa, taxasPct, impostoPct, freteCliente) {
+            if (!charts.be) return;
+            const maxVolume = Math.max(100, Math.ceil(custoFixo / (precoBE - custoVar) * 1.5));
+            const step = Math.ceil(maxVolume / 10);
+            const volumes = [];
+            for (let i = 0; i <= maxVolume; i += step) volumes.push(i);
+            const receitas = volumes.map(v => v * precoAtual);
+            const custos = volumes.map(v => { const nf = precoAtual + freteCliente; const imposto = nf * impostoPct; const taxas = precoAtual * taxasPct + taxaFixa; return custoFixo + (v * (custoVar + imposto + taxas - freteCliente)); });
+            let beIndex = -1;
+            for (let i = 0; i < volumes.length; i++) { if (receitas[i] >= custos[i] && beIndex === -1) { beIndex = i; break; } }
+            const pontoEquilibrio = new Array(volumes.length).fill(null);
+            if (beIndex >= 0) pontoEquilibrio[beIndex] = receitas[beIndex];
+            charts.be.data.labels = volumes.map(v => v.toString());
+            charts.be.data.datasets[0].data = receitas;
+            charts.be.data.datasets[1].data = custos;
+            charts.be.data.datasets[2].data = pontoEquilibrio;
+            charts.be.update('none');
+        }
+
+        function toggleDiaInput(select) {
+            const diaInput = select.nextElementSibling;
+            if (select.value === 'parcial') {
+                diaInput.classList.remove('hidden');
+            } else {
+                diaInput.classList.add('hidden');
+            }
+        }
+
+        function removerMes(btn) {
+            btn.closest('.item-row').remove();
+            calcularHistorico();
+        }
+
+        function calcularHistorico() {
+            const rows = document.querySelectorAll('#historicoContainer .item-row');
+            let lucrosRaw = [];
+            let lucrosNorm = [];
+
+            rows.forEach((row) => {
+                const vendas = parseFloat(row.querySelector('.vendas-input').value) || 0;
+                const margem = parseFloat(row.querySelector('.margem-input').value) || 0;
+                const status = row.querySelector('.month-status').value;
+                const dia = parseInt(row.querySelector('.month-dia').value) || 1;
+
+                const lucro = vendas * (margem / 100);
+                lucrosRaw.push(lucro);
+                row.querySelector('.month-total').textContent = formatMoney(lucro);
+
+                let lNorm = lucro;
+                if (status === 'parcial' && dia > 0 && dia <= 31 && vendas > 0) {
+                    lNorm = (lucro / dia) * 30;
+                }
+                lucrosNorm.push(lNorm);
+            });
+
+            for (let i = 0; i < lucrosNorm.length - 1; i++) {
+                const atual = lucrosNorm[i], anterior = lucrosNorm[i + 1];
+                const crescimento = anterior > 0 ? ((atual - anterior) / anterior * 100).toFixed(1) : 0;
+                const badge = rows[i].querySelector('.growth-badge');
+
+                const isParcial = rows[i].querySelector('.month-status').value === 'parcial';
+                const prefix = isParcial ? '(Proj) ' : '';
+
+                if (crescimento > 0) { 
+                    badge.className = 'growth-badge growth-positive'; 
+                    badge.innerHTML = `▲ ${prefix}${crescimento}%`; 
+                } else if (crescimento < 0) { 
+                    badge.className = 'growth-badge growth-negative'; 
+                    badge.innerHTML = `▼ ${prefix}${Math.abs(crescimento)}%`; 
+                } else { 
+                    badge.className = 'growth-badge growth-neutral'; 
+                    badge.textContent = '-'; 
+                }
+            }
+            atualizarProjecao();
+        }
+
+        function adicionarMes() {
+            const container = document.getElementById('historicoContainer');
+            const firstRow = container.querySelector('.item-row');
+
+            let proximoMes, proximoAno;
+            const mesesStr = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+            if (firstRow) {
+                const nomeInput = firstRow.querySelector('.nome-mes').value.trim();
+                const partes = nomeInput.split(' ');
+                if (partes.length === 2) {
+                    const mesIndex = mesesStr.indexOf(partes[0]);
+                    let ano = parseInt(partes[1]);
+
+                    if (mesIndex !== -1 && !isNaN(ano)) {
+                        let nextIndex = mesIndex + 1;
+                        if (nextIndex > 11) {
+                            nextIndex = 0;
+                            ano++;
+                        }
+                        proximoMes = mesesStr[nextIndex];
+                        proximoAno = ano;
+                    }
+                }
+            }
+
+            if (!proximoMes) {
+                const hoje = new Date();
+                proximoMes = mesesStr[hoje.getMonth()];
+                proximoAno = hoje.getFullYear();
+            }
+
+            const nomeNovo = `${proximoMes} ${proximoAno}`;
+            const row = document.createElement('div');
+            row.className = 'month-grid item-row';
+            row.innerHTML = `
+                <input type="text" class="month-input nome-mes" value="${nomeNovo}"/>
+                <input type="number" class="month-input mono visitas-input" value="0" oninput="calcularHistorico()"/>
+                <input type="number" class="month-input mono volume-input" value="0" oninput="calcularHistorico()"/>
+                <input type="number" class="month-input mono vendas-input" value="0" oninput="calcularHistorico()"/>
+                <div class="input-group">
+                    <input type="number" class="month-input mono margem-input" value="0" step="0.1" oninput="calcularHistorico()"/>
+                    <span class="input-addon">%</span>
+                </div>
+                <div class="month-total mono">-</div>
+                <div class="growth-badge growth-neutral">-</div>
+                <div class="status-container">
+                    <select class="month-status" onchange="toggleDiaInput(this); calcularHistorico();">
+                        <option value="parcial" selected>Em Curso</option>
+                        <option value="completo">Fechado</option>
+                    </select>
+                    <input type="number" class="month-dia" placeholder="Dia" min="1" max="31" value="15" oninput="calcularHistorico()"/>
+                </div>
+                <button class="btn-delete-month" onclick="removerMes(this)"><i class="fas fa-times"></i></button>
+            `;
+
+            container.insertBefore(row, container.firstChild);
+            calcularHistorico();
+        }
+
+        function atualizarProjecao() {
+            const rows = Array.from(document.querySelectorAll('#historicoContainer .item-row'));
+            let lucros = [];
+            let faturamentos = [];
+
+            rows.forEach(row => {
+                const vendasRaw = parseFloat(row.querySelector('.vendas-input').value) || 0;
+                const margem = parseFloat(row.querySelector('.margem-input').value) || 0;
+                const status = row.querySelector('.month-status').value;
+                const dia = parseInt(row.querySelector('.month-dia').value) || 1;
+
+                let vendasNorm = vendasRaw;
+                if (status === 'parcial' && dia > 0 && dia <= 31 && vendasRaw > 0) {
+                    vendasNorm = (vendasRaw / dia) * 30; 
+                }
+
+                const lucroNorm = vendasNorm * (margem / 100);
+
+                if (vendasRaw > 0) {
+                    lucros.push(lucroNorm);
+                    faturamentos.push(vendasNorm);
+                }
+            });
+
+            let avgGrowthLucro = 0.05;
+            let avgGrowthFat = 0.05;
+
+            if (lucros.length >= 2) {
+                let sumGL = 0, sumGF = 0, count = 0;
+                for (let i = 0; i < Math.min(lucros.length - 1, 3); i++) {
+                    const currentL = lucros[i];
+                    const pastL = lucros[i+1];
+                    const currentF = faturamentos[i];
+                    const pastF = faturamentos[i+1];
+
+                    if (pastL > 0) sumGL += (currentL - pastL) / pastL;
+                    if (pastF > 0) sumGF += (currentF - pastF) / pastF;
+                    count++;
+                }
+                if (count > 0) {
+                    avgGrowthLucro = sumGL / count;
+                    avgGrowthFat = sumGF / count;
+                }
+            }
+
+            avgGrowthLucro = Math.max(-0.2, Math.min(0.5, avgGrowthLucro));
+            avgGrowthFat = Math.max(-0.2, Math.min(0.5, avgGrowthFat));
+
+            const baseLucro = lucros.length > 0 ? Math.max(0, lucros[0]) : 1000;
+            const baseFat = faturamentos.length > 0 ? Math.max(0, faturamentos[0]) : 3000;
+
+            const labels = [], projLucros = [], projFat = [];
+
+            for (let i = 1; i <= 6; i++) {
+                const data = new Date(); 
+                if (rows.length > 0) {
+                    const firstRowName = rows[0].querySelector('.nome-mes').value;
+                    const mesesStr = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                    const partes = firstRowName.split(' ');
+                    if (partes.length === 2) {
+                        data.setMonth(mesesStr.indexOf(partes[0]) + i);
+                        data.setFullYear(parseInt(partes[1]));
+                    }
+                } else {
+                    data.setMonth(data.getMonth() + i);
+                }
+
+                labels.push(data.toLocaleDateString('pt-BR', { month: 'short' }));
+                projLucros.push(Math.round(baseLucro * Math.pow(1 + avgGrowthLucro, i)));
+                projFat.push(Math.round(baseFat * Math.pow(1 + avgGrowthFat, i)));
+            }
+
+            if (charts.projecao) { 
+                charts.projecao.data.labels = labels; 
+                charts.projecao.data.datasets[0].data = projLucros; 
+
+                if (charts.projecao.data.datasets.length === 1) {
+                    charts.projecao.data.datasets.push({
+                        label: 'GMV (Receita) Projetado',
+                        data: projFat,
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6,182,212,0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#06b6d4',
+                        borderDash: [5, 5]
+                    });
+                } else {
+                    charts.projecao.data.datasets[1].data = projFat;
+                }
+
+                charts.projecao.options.plugins.legend.display = true;
+                charts.projecao.update(); 
+            }
+        }
+
+        function calcularTudo() {
+            calcularLord(); calcularHistorico(); calcularBreakEven(); calcularSimuladorPreco();
+            showToast('✅ Banco de dados atualizado com sucesso!', 'success');
+        }
+
+        function salvarCalculo() {
+            if (!decrementarUso()) return;
+
+            const calculo = {
+                id: Date.now(),
+                sku: document.getElementById('produtoSKU').value || 'PROD-001',
+                nome: document.getElementById('produtoNome').value || 'Produto',
+                plataforma: PLATFORM_DATA[currentPlatform].nome,
+                custo: parseFloat(document.getElementById('lordCusto').value) || 0,
+                markup: parseFloat(document.getElementById('lordMarkup').value) || 0,
+                lucroSem: document.getElementById('quickLucroSem').textContent,
+                lucroCom: document.getElementById('quickLucroCom').textContent,
+                precoVitrine: document.getElementById('quickVitrine').textContent,
+                precoFinal: document.getElementById('quickFinal').textContent,
+                breakEven: document.getElementById('quickBE').textContent,
+                data: new Date().toLocaleString('pt-BR')
+            };
+            savedCalculations.unshift(calculo);
+            localStorage.setItem('lordProfit_v14', JSON.stringify(savedCalculations));
+            renderSavedList();
+            showToast('✅ Arquivo salvo na memória!', 'success');
+        }
+
+        function renderSavedList() {
+            const list = document.getElementById('savedList');
+            if (savedCalculations.length === 0) {
+                list.innerHTML = `<div style="text-align:center; padding:4rem; color:var(--text-muted);"><i class="fas fa-folder-open" style="font-size:3rem; margin-bottom:1rem; opacity:0.3;"></i><p style="font-size:0.9rem; font-weight:600;">O arquivo está vazio no momento.</p></div>`;
+                return;
+            }
+            list.innerHTML = savedCalculations.map(c => `
+                <div class="saved-item" onclick="carregarCalculo(${c.id})">
+                    <div class="info">
+                        <div class="sku">${c.sku} <span style="font-size:0.7rem; font-weight:600; color:var(--text-muted); padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-left: 6px;">${c.plataforma}</span></div>
+                        <div class="date">${c.nome} • Registrado em: ${c.data}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap: 1rem;">
+                        <div class="lucro">${c.lucroSem}</div>
+                        <button onclick="event.stopPropagation(); excluirCalculo(${c.id})" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:8px; width: 32px; height: 32px; color:var(--danger); cursor:pointer; transition: all 0.2s;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function carregarCalculo(id) {
+            const c = savedCalculations.find(x => x.id === id);
+            if (!c) return;
+            document.getElementById('produtoSKU').value = c.sku;
+            document.getElementById('produtoNome').value = c.nome;
+            document.getElementById('lordCusto').value = c.custo;
+            document.getElementById('lordMarkup').value = c.markup;
+            calcularLord();
+            showSection('precificacao', document.querySelectorAll('.nav-item')[0]);
+            showToast('✅ Extração concluída!', 'success');
+        }
+
+        function excluirCalculo(id) {
+            savedCalculations = savedCalculations.filter(c => c.id !== id);
+            localStorage.setItem('lordProfit_v14', JSON.stringify(savedCalculations));
+            renderSavedList();
+            showToast('✅ Registro apagado!', 'success');
+        }
+
+        function limparSalvos() {
+            if (!confirm('Esta ação irá formatar todo o histórico salvo. Continuar?')) return;
+            savedCalculations = [];
+            localStorage.setItem('lordProfit_v14', '[]');
+            renderSavedList();
+            showToast('✅ Banco de dados limpo!', 'success');
+        }
+
+        function abrirModalPDF() {
+            const modal = document.getElementById('modalPDF');
+            const list = document.getElementById('pdfExportList');
+            pdfSelecionados.clear();
+
+            if (savedCalculations.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align:center; padding:3rem; color:var(--text-muted);">
+                        <i class="fas fa-inbox" style="font-size:2.5rem; margin-bottom:1rem; opacity:0.3;"></i>
+                        <p style="font-size:0.9rem; font-weight: 600;">Sem registros para exportar.</p>
+                        <p style="font-size:0.75rem; margin-top:0.5rem; opacity: 0.8;">Salve um cálculo na aba principal primeiro.</p>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = savedCalculations.map((c) => `
+                    <div class="pdf-export-item" onclick="togglePDFSelecaoDiv(${c.id})">
+                        <input type="checkbox" id="pdf-check-${c.id}" onchange="togglePDFSelecao(${c.id}); event.stopPropagation();">
+                        <label style="pointer-events:none;">
+                            <div class="sku">${c.sku}</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight: 500; margin-top: 2px;">${c.nome} • ${c.plataforma}</div>
+                        </label>
+                        <div class="lucro ${c.lucroSem.includes('-') ? 'text-danger' : 'text-success'}">${c.lucroSem}</div>
+                    </div>
+                `).join('');
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function fecharModalPDF() {
+            document.getElementById('modalPDF').style.display = 'none';
+        }
+
+        function togglePDFSelecao(id) {
+            if (pdfSelecionados.has(id)) {
+                pdfSelecionados.delete(id);
+            } else {
+                pdfSelecionados.add(id);
+            }
+        }
+
+        function togglePDFSelecaoDiv(id) {
+            const checkbox = document.getElementById(`pdf-check-${id}`);
+            checkbox.checked = !checkbox.checked;
+            togglePDFSelecao(id);
+        }
+
+        function selecionarTodosPDF() {
+            const checkboxes = document.querySelectorAll('#pdfExportList input[type="checkbox"]');
+            const todosSelecionados = pdfSelecionados.size === savedCalculations.length;
+
+            if (todosSelecionados) {
+                pdfSelecionados.clear();
+                checkboxes.forEach(cb => cb.checked = false);
+            } else {
+                savedCalculations.forEach(c => pdfSelecionados.add(c.id));
+                checkboxes.forEach(cb => cb.checked = true);
+            }
+        }
+
+        function exportarPDFSelecionados() {
+            if (pdfSelecionados.size === 0) {
+                showToast('Selecione pelo menos um registro para impressão!', 'error');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const selecionados = savedCalculations.filter(c => pdfSelecionados.has(c.id));
+
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, 0, 210, 297, 'F');
+
+            doc.setTextColor(6, 182, 212);
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text('LORD PROFIT', 105, 20, { align: 'center' });
+
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Auditoria de Precificação', 105, 28, { align: 'center' });
+
+            let y = 40;
+
+            selecionados.forEach((c) => {
+                if (y > 250) {
+                    doc.addPage();
+                    doc.setFillColor(255, 255, 255);
+                    doc.rect(0, 0, 210, 297, 'F');
+                    y = 20;
+                }
+
+                doc.setDrawColor(6, 182, 212);
+                doc.setLineWidth(0.5);
+                doc.roundedRect(15, y, 180, 55, 3, 3, 'S');
+
+                doc.setTextColor(6, 182, 212);
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${c.sku} - ${c.nome}`, 20, y + 10);
+
+                doc.setTextColor(100, 100, 100);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Operador: ${c.plataforma} | Ref: ${c.data}`, 20, y + 18);
+
+                doc.setFontSize(10);
+                const col1 = 20, col2 = 75, col3 = 130;
+
+                doc.setTextColor(80, 80, 80);
+                doc.text('Preço Vitrine:', col1, y + 30);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont('helvetica', 'bold');
+                doc.text(c.precoVitrine || '-', col1 + 35, y + 30);
+
+                doc.setTextColor(80, 80, 80);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Preço Final:', col2, y + 30);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont('helvetica', 'bold');
+                doc.text(c.precoFinal || '-', col2 + 30, y + 30);
+
+                doc.setTextColor(80, 80, 80);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Break-Even:', col3, y + 30);
+                doc.setTextColor(245, 158, 11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(c.breakEven || '-', col3 + 30, y + 30);
+
+                doc.setTextColor(80, 80, 80);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Lucro Sem Afiliado:', col1, y + 42);
+                const lucroSemNum = parseFloat(c.lucroSem.replace(/[^\d,-]/g, '').replace(',', '.'));
+                doc.setTextColor(lucroSemNum >= 0 ? 16 : 239, lucroSemNum >= 0 ? 185 : 68, lucroSemNum >= 0 ? 129 : 68);
+                doc.setFont('helvetica', 'bold');
+                doc.text(c.lucroSem, col1 + 40, y + 42);
+
+                doc.setTextColor(80, 80, 80);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Lucro Com Afiliado:', col2, y + 42);
+                const lucroComNum = parseFloat(c.lucroCom.replace(/[^\d,-]/g, '').replace(',', '.'));
+                doc.setTextColor(lucroComNum >= 0 ? 139 : 239, lucroComNum >= 0 ? 92 : 68, lucroComNum >= 0 ? 246 : 68);
+                doc.setFont('helvetica', 'bold');
+                doc.text(c.lucroCom, col2 + 42, y + 42);
+
+                y += 65;
+            });
+
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Sistema de Pricing Emitido em ${new Date().toLocaleString('pt-BR')} - Lord Profit v14`, 105, 290, { align: 'center' });
+
+            doc.save(`Auditoria_Precificacao_${new Date().toISOString().split('T')[0]}.pdf`);
+            fecharModalPDF();
+            showToast(`✅ Download autorizado! ${selecionados.length} relatório(s) exportado(s).`, 'success');
+        }
+
+        // FUNÇÕES DE PRODUÇÃO
+        function previewFoto(input) {
+            const preview = document.getElementById('prodFotoPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.add('active');
+                    fotoAtual = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function calcularProducao() {
+            const corteQtd = parseFloat(document.getElementById('corteQtd').value) || 0;
+            const corteUnit = parseFloat(document.getElementById('corteUnit').value) || 0;
+            const corteTotal = corteQtd * corteUnit;
+
+            const costuraEnviada = parseFloat(document.getElementById('costuraEnviada').value) || 0;
+            const costuraUnit = parseFloat(document.getElementById('costuraUnit').value) || 0;
+            const costuraRetornada = parseFloat(document.getElementById('costuraRetornada').value) || 0;
+            const costuraTotal = costuraEnviada * costuraUnit;
+            const perda = costuraEnviada - costuraRetornada;
+
+            const tecidoValor = parseFloat(document.getElementById('tecidoValor').value) || 0;
+            const transporteValor = parseFloat(document.getElementById('transporteValor').value) || 0;
+
+            const totalGeral = corteTotal + costuraTotal + tecidoValor + transporteValor;
+            const custoPorPeca = costuraRetornada > 0 ? totalGeral / costuraRetornada : 0;
+
+            document.getElementById('corteTotal').textContent = formatMoney(corteTotal);
+            document.getElementById('costuraTotal').textContent = formatMoney(costuraTotal);
+            document.getElementById('producaoTotalGeral').textContent = formatMoney(totalGeral);
+            document.getElementById('custoPorPeca').textContent = formatMoney(custoPorPeca);
+
+            const perdaBox = document.getElementById('perdaBox');
+            if (perda > 0) {
+                perdaBox.style.display = 'flex';
+                document.getElementById('perdaValor').textContent = `${perda} peças (${((perda/costuraEnviada)*100).toFixed(1)}%)`;
+            } else {
+                perdaBox.style.display = 'none';
+            }
+        }
+
+        function salvarProducao() {
+            if (!decrementarUso()) return;
+
+            const sku = document.getElementById('prodSku').value || 'SEM-SKU';
+            const descricao = document.getElementById('prodDescricao').value || 'Sem descrição';
+
+            const corteQtd = parseFloat(document.getElementById('corteQtd').value) || 0;
+            const corteUnit = parseFloat(document.getElementById('corteUnit').value) || 0;
+            const corteTotal = corteQtd * corteUnit;
+
+            const costuraEnviada = parseFloat(document.getElementById('costuraEnviada').value) || 0;
+            const costuraUnit = parseFloat(document.getElementById('costuraUnit').value) || 0;
+            const costuraRetornada = parseFloat(document.getElementById('costuraRetornada').value) || 0;
+            const costuraTotal = costuraEnviada * costuraUnit;
+            const perda = costuraEnviada - costuraRetornada;
+
+            if (costuraEnviada > corteQtd) {
+                showToast('❌ Erro: Quantidade enviada não pode ser maior que a quantidade cortada!', 'error');
+                return;
+            }
+
+            if (costuraRetornada > costuraEnviada) {
+                showToast('❌ Erro: Quantidade retornada não pode ser maior que a quantidade enviada!', 'error');
+                return;
+            }
+
+            const tecidoValor = parseFloat(document.getElementById('tecidoValor').value) || 0;
+            const transporteValor = parseFloat(document.getElementById('transporteValor').value) || 0;
+
+            const total = corteTotal + costuraTotal + tecidoValor + transporteValor;
+            const custoPorPeca = costuraRetornada > 0 ? total / costuraRetornada : 0;
+
+            const producao = {
+                id: Date.now(),
+                sku,
+                descricao,
+                foto: fotoAtual,
+                corte: { qtd: corteQtd, unit: corteUnit, total: corteTotal },
+                costura: { enviada: costuraEnviada, retornada: costuraRetornada, unit: costuraUnit, total: costuraTotal, perda },
+                tecido: tecidoValor,
+                transporte: transporteValor,
+                total,
+                custoPorPeca,
+                data: new Date().toLocaleString('pt-BR')
+            };
+
+            producoes.unshift(producao);
+            localStorage.setItem('lordProfit_producao_v14', JSON.stringify(producoes));
+            renderProducoes();
+            limparFormProducao();
+            showToast('✅ Lote de produção salvo!', 'success');
+        }
+
+        function limparFormProducao() {
+            document.getElementById('prodSku').value = '';
+            document.getElementById('prodDescricao').value = '';
+            document.getElementById('corteQtd').value = '100';
+            document.getElementById('corteUnit').value = '2.50';
+            document.getElementById('costuraEnviada').value = '100';
+            document.getElementById('costuraUnit').value = '8.00';
+            document.getElementById('costuraRetornada').value = '95';
+            document.getElementById('tecidoValor').value = '500';
+            document.getElementById('transporteValor').value = '50';
+            document.getElementById('prodFotoPreview').classList.remove('active');
+            document.getElementById('prodFotoPreview').src = '';
+            document.getElementById('prodFotoInput').value = '';
+            fotoAtual = null;
+            calcularProducao();
+        }
+
+        function renderProducoes() {
+            const tbody = document.getElementById('producaoTableBody');
+            if (producoes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:3rem; color:var(--text-muted);">Nenhum lote registrado ainda.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = producoes.map(p => {
+                if (!p.estoque) p.estoque = p.costura.retornada;
+                const totalVendido = p.vendas ? p.vendas.reduce((sum, v) => sum + v.quantidade, 0) : 0;
+
+                return `<tr>
+                    <td>${p.foto ? `<img src="${p.foto}" class="produto-foto-thumb" onclick="verFoto('${p.foto}')"/>` : '<div style="width:50px;height:50px;background:rgba(255,255,255,0.05);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);"><i class="fas fa-image"></i></div>'}</td>
+                    <td class="mono" style="font-weight:700;">${p.sku}</td>
+                    <td>${p.descricao}</td>
+                    <td class="mono">${p.corte.qtd} / ${formatMoney(p.corte.unit)} / <strong style="color:var(--neon-cyan);">${formatMoney(p.corte.total)}</strong></td>
+                    <td class="mono">
+                        ${p.costura.enviada} / ${p.costura.retornada} 
+                        ${p.costura.perda > 0 ? `<span style="color:var(--danger);">(${p.costura.perda} perdidas)</span>` : ''}
+                    </td>
+                    <td class="mono">${formatMoney(p.tecido)}</td>
+                    <td class="mono">${formatMoney(p.transporte)}</td>
+                    <td class="mono" style="font-weight:800; color:var(--plat-color);">${formatMoney(p.total)}</td>
+                    <td class="mono" style="font-weight:800; color:var(--success); font-size:1.1rem;">${formatMoney(p.custoPorPeca)}</td>
+                    <td class="mono" style="font-weight:700; color:var(--neon-cyan);">${p.estoque}</td>
+                    <td class="mono" style="font-size:0.8rem; color:var(--text-muted);">${totalVendido} vendas</td>
+                    <td>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button onclick="abrirModalVenda(${p.id})" class="btn btn-sm btn-success" title="Registrar Venda" ${p.estoque <= 0 ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-shopping-cart"></i></button>
+                            <button onclick="imprimirOrdemCostura(${p.id})" class="btn btn-sm btn-secondary" title="Imprimir Ordem"><i class="fas fa-print"></i></button>
+                            <button onclick="excluirProducao(${p.id})" class="btn btn-sm btn-danger" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function excluirProducao(id) {
+            if (!confirm('Deseja excluir este lote de produção?')) return;
+            producoes = producoes.filter(p => p.id !== id);
+            localStorage.setItem('lordProfit_producao_v14', JSON.stringify(producoes));
+            renderProducoes();
+            showToast('✅ Lote excluído!', 'success');
+        }
+
+        function imprimirOrdemCostura(id) {
+            const p = producoes.find(x => x.id === id);
+            if (!p) return;
+
+            const conteudo = document.getElementById('conteudoImpressao');
+            conteudo.innerHTML = `
+                <h2>ORDEM DE COSTURA</h2>
+                <div class="info-row"><strong>Data:</strong> ${p.data}</div>
+                <div class="info-row"><strong>SKU:</strong> ${p.sku}</div>
+                <div class="info-row"><strong>Descrição:</strong> ${p.descricao}</div>
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #ccc;">
+                ${p.foto ? `<img src="${p.foto}" class="foto-grande" alt="Produto"/>` : ''}
+                <div class="info-row" style="font-size: 1.3rem; margin-top: 1.5rem;"><strong>Quantidade para Costura:</strong> ${p.corte.qtd} peças</div>
+                <div class="info-row" style="font-size: 1.3rem;"><strong>Valor Unitário Combinado:</strong> R$ ${p.costura.unit.toFixed(2).replace('.', ',')}</div>
+                <div class="destaque">
+                    TOTAL DO SERVIÇO: R$ ${(p.corte.qtd * p.costura.unit).toFixed(2).replace('.', ',')}
+                </div>
+                <div style="margin-top: 2rem; padding: 1rem; border: 1px dashed #999; text-align: center; font-size: 0.9rem; color: #666;">
+                    <strong>OBSERVAÇÕES:</strong><br>
+                    ___________________________________________________<br><br>
+                    ___________________________________________________
+                </div>
+                <div style="margin-top: 2rem; display: flex; justify-content: space-between; font-size: 0.9rem;">
+                    <div>Assinatura Costureira: _________________</div>
+                    <div>Data Entrega: __/__/____</div>
+                </div>
+            `;
+
+            document.getElementById('modalImpressao').style.display = 'block';
+        }
+
+        function abrirModalVenda(id) {
+            if (verificarBloqueio()) {
+                showToast('❌ Limite de uso atingido!', 'error');
+                return;
+            }
+            vendaProducaoId = id;
+            const modal = document.getElementById('modalVenda');
+            if (modal) modal.style.display = 'block';
+        }
+
+        function fecharModalVenda() {
+            const modal = document.getElementById('modalVenda');
+            if (modal) modal.style.display = 'none';
+            vendaProducaoId = null;
+        }
+
+        function confirmarVenda() {
+            if (!decrementarUso()) return;
+
+            const qtdInput = document.getElementById('vendaQuantidade');
+            const qtd = parseInt(qtdInput ? qtdInput.value : 0) || 0;
+
+            if (qtd <= 0) {
+                showToast('❌ Quantidade inválida!', 'error');
+                return;
+            }
+
+            const p = producoes.find(x => x.id === vendaProducaoId);
+            if (!p) {
+                showToast('❌ Produção não encontrada!', 'error');
+                return;
+            }
+
+            if (!p.estoque) p.estoque = p.costura.retornada;
+
+            if (p.estoque < qtd) {
+                showToast(`❌ Estoque insuficiente! Disponível: ${p.estoque}`, 'error');
+                return;
+            }
+
+            p.estoque -= qtd;
+
+            if (!p.vendas) p.vendas = [];
+            p.vendas.push({
+                data: new Date().toLocaleString('pt-BR'),
+                quantidade: qtd
+            });
+
+            localStorage.setItem('lordProfit_producao_v14', JSON.stringify(producoes));
+            renderProducoes();
+            fecharModalVenda();
+            showToast(`✅ Venda de ${qtd} unidade(s) registrada!`, 'success');
+        }
+
+        function fecharImpressao() {
+            document.getElementById('modalImpressao').style.display = 'none';
+        }
+
+        function verFoto(foto) {
+            const win = window.open();
+            win.document.write(`<img src="${foto}" style="max-width:100%; height:auto;"/>`);
+        }
+
+        // ========== FUNÇÕES DE EXPORTAÇÃO EXCEL ==========
+        async function exportarExcelPrecificacoes() {
+            if (!decrementarUso()) return;
+
+            if (savedCalculations.length === 0) {
+                showToast('❌ Nenhum dado para exportar!', 'error');
+                return;
+            }
+
+            const dados = savedCalculations.map(c => ({
+                'SKU': c.sku,
+                'Produto': c.nome,
+                'Plataforma': c.plataforma,
+                'Custo (R$)': c.custo,
+                'Markup (%)': c.markup,
+                'Preço Vitrine': c.precoVitrine,
+                'Preço Final': c.precoFinal,
+                'Break-Even': c.breakEven,
+                'Lucro s/ Afiliado': c.lucroSem,
+                'Lucro c/ Afiliado': c.lucroCom,
+                'Data': c.data
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dados);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Precificações");
+
+            ws['!cols'] = [
+                {wch: 15}, {wch: 25}, {wch: 15}, {wch: 12}, 
+                {wch: 12}, {wch: 15}, {wch: 15}, {wch: 15}, 
+                {wch: 18}, {wch: 18}, {wch: 20}
+            ];
+
+            XLSX.writeFile(wb, `LordProfit_Precificacoes_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('✅ Excel gerado com sucesso!', 'success');
+        }
+
+        async function exportarExcelProducao() {
+            if (!decrementarUso()) return;
+
+            if (producoes.length === 0) {
+                showToast('❌ Nenhuma produção para exportar!', 'error');
+                return;
+            }
+
+            const dados = producoes.map(p => {
+                const totalVendido = p.vendas ? p.vendas.reduce((sum, v) => sum + v.quantidade, 0) : 0;
+                return {
+                    'SKU': p.sku,
+                    'Descrição': p.descricao,
+                    'Data': p.data,
+                    'Corte (Qtd)': p.corte.qtd,
+                    'Corte (Unit R$)': p.corte.unit,
+                    'Corte (Total R$)': p.corte.total,
+                    'Costura Enviada': p.costura.enviada,
+                    'Costura Retornada': p.costura.retornada,
+                    'Perdas': p.costura.perda,
+                    'Costura (Unit R$)': p.costura.unit,
+                    'Costura (Total R$)': p.costura.total,
+                    'Tecido (R$)': p.tecido,
+                    'Transporte (R$)': p.transporte,
+                    'Custo Total (R$)': p.total,
+                    'Custo por Peça (R$)': p.custoPorPeca,
+                    'Estoque Atual': p.estoque || p.costura.retornada,
+                    'Total Vendido': totalVendido
+                };
+            });
+
+            const ws = XLSX.utils.json_to_sheet(dados);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Produção");
+
+            ws['!cols'] = [
+                {wch: 15}, {wch: 25}, {wch: 20}, {wch: 12}, {wch: 12}, 
+                {wch: 12}, {wch: 15}, {wch: 15}, {wch: 10}, {wch: 12}, 
+                {wch: 12}, {wch: 12}, {wch: 12}, {wch: 15}, {wch: 18}, {wch: 15}, {wch: 12}
+            ];
+
+            XLSX.writeFile(wb, `LordProfit_Producao_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('✅ Excel de produção gerado!', 'success');
+        }
+
+        async function exportarExcelHistorico() {
+            if (!decrementarUso()) return;
+
+            const rows = document.querySelectorAll('#historicoContainer .item-row');
+            if (rows.length === 0) {
+                showToast('❌ Nenhum histórico para exportar!', 'error');
+                return;
+            }
+
+            const dados = [];
+            rows.forEach(row => {
+                const mes = row.querySelector('.nome-mes').value;
+                const visitas = row.querySelector('.visitas-input').value;
+                const volume = row.querySelector('.volume-input').value;
+                const vendas = row.querySelector('.vendas-input').value;
+                const margem = row.querySelector('.margem-input').value;
+                const total = row.querySelector('.month-total').textContent;
+                const status = row.querySelector('.month-status').value;
+
+                dados.push({
+                    'Mês': mes,
+                    'Status': status === 'completo' ? 'Fechado' : 'Em Curso',
+                    'Visitas': parseInt(visitas) || 0,
+                    'Pedidos': parseInt(volume) || 0,
+                    'GMV (R$)': parseFloat(vendas) || 0,
+                    'Margem (%)': parseFloat(margem) || 0,
+                    'Lucro (R$)': parseFloat(total.replace(/[^0-9,-]/g, '').replace(',', '.')) || 0
+                });
+            });
+
+            const ws = XLSX.utils.json_to_sheet(dados);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Performance");
+
+            ws['!cols'] = [
+                {wch: 15}, {wch: 12}, {wch: 12}, {wch: 10}, 
+                {wch: 15}, {wch: 12}, {wch: 15}
+            ];
+
+            XLSX.writeFile(wb, `LordProfit_Performance_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('✅ Excel de performance gerado!', 'success');
+        }
+
+        async function exportarExcelDRE() {
+            if (!decrementarUso()) return;
+
+            if (!lastCalculo) {
+                showToast('❌ Realize um cálculo primeiro!', 'error');
+                return;
+            }
+
+            const dados = [
+                {'Item': 'RECEITA', 'Valor': lastCalculo.receitaTotal, 'Tipo': 'Positivo'},
+                {'Item': 'Preço Final', 'Valor': lastCalculo.precoFinal, 'Tipo': 'Receita'},
+                {'Item': 'Frete Cliente', 'Valor': lastCalculo.freteCliente, 'Tipo': 'Receita'},
+                {'Item': '', 'Valor': '', 'Tipo': ''},
+                {'Item': 'CUSTOS E DESPESAS', 'Valor': '', 'Tipo': 'Negativo'},
+                {'Item': 'Custo Produto', 'Valor': lastCalculo.custo, 'Tipo': 'Custo'},
+                {'Item': 'Frete Custo', 'Valor': lastCalculo.freteCusto, 'Tipo': 'Custo'},
+                {'Item': 'Embalagem', 'Valor': lastCalculo.embalagem, 'Tipo': 'Custo'},
+                {'Item': 'Imposto (DAS)', 'Valor': lastCalculo.valorImposto, 'Tipo': 'Taxa'},
+                {'Item': 'Taxas Plataforma', 'Valor': lastCalculo.valorTaxas, 'Tipo': 'Taxa'},
+                {'Item': 'Comissão Afiliado', 'Valor': lastCalculo.comissaoAfiliado, 'Tipo': 'Comissão'},
+                {'Item': '', 'Valor': '', 'Tipo': ''},
+                {'Item': 'RESULTADO', 'Valor': '', 'Tipo': 'Total'},
+                {'Item': 'Lucro s/ Afiliado', 'Valor': lastCalculo.lucroSem, 'Tipo': 'Lucro'},
+                {'Item': 'Lucro c/ Afiliado', 'Valor': lastCalculo.lucroCom, 'Tipo': 'Lucro'}
+            ];
+
+            const ws = XLSX.utils.json_to_sheet(dados);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "DRE");
+
+            ws['!cols'] = [{wch: 25}, {wch: 15}, {wch: 15}];
+
+            XLSX.writeFile(wb, `LordProfit_DRE_${document.getElementById('produtoSKU').value || 'PROD'}_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('✅ DRE exportada para Excel!', 'success');
+        }
+
+        async function exportarExcelSimulacao() {
+            if (!decrementarUso()) return;
+
+            const precoBase = parseFloat(document.getElementById('simPrecoVenda').value) || 0;
+            const lucro = document.getElementById('simResultadoValor').textContent;
+            const margem = document.getElementById('simMargem').textContent;
+
+            const dados = [
+                {'Métrica': 'Preço Base', 'Valor': precoBase},
+                {'Métrica': 'Lucro Estimado', 'Valor': lucro},
+                {'Métrica': 'Margem', 'Valor': margem},
+                {'Métrica': 'Plataforma', 'Valor': PLATFORM_DATA[currentPlatform].nome},
+                {'Métrica': 'Data', 'Valor': new Date().toLocaleString('pt-BR')}
+            ];
+
+            const linhas = document.querySelectorAll('#tabelaSimulacao tbody tr');
+            if (linhas.length > 0) {
+                dados.push({});
+                dados.push({'Métrica': 'DETALHAMENTO', 'Valor': ''});
+                linhas.forEach(tr => {
+                    const cols = tr.querySelectorAll('td');
+                    if (cols.length >= 2) {
+                        dados.push({
+                            'Métrica': cols[0].textContent,
+                            'Valor': cols[1].textContent
+                        });
+                    }
+                });
+            }
+
+            const ws = XLSX.utils.json_to_sheet(dados);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Simulação");
+
+            ws['!cols'] = [{wch: 40}, {wch: 20}];
+
+            XLSX.writeFile(wb, `LordProfit_Simulacao_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('✅ Simulação exportada!', 'success');
+        }
+
+        // ========== SISTEMA DE LICENÇA ==========
+        const STORAGE_KEY_LICENCA = 'lord_profit_licenca_v1';
+        const SENHA_RESET = 'diegolord';
+        const USOS_INICIAIS = 10;
+
+        function initLicenca() {
+            let licenca = localStorage.getItem(STORAGE_KEY_LICENCA);
+            if (!licenca) {
+                licenca = JSON.stringify({ usosRestantes: USOS_INICIAIS });
+                localStorage.setItem(STORAGE_KEY_LICENCA, licenca);
+            }
+            atualizarDisplayUsos();
+            verificarBloqueio();
+        }
+
+        function getUsosRestantes() {
+            const licenca = localStorage.getItem(STORAGE_KEY_LICENCA);
+            if (licenca) {
+                return JSON.parse(licenca).usosRestantes;
+            }
+            return USOS_INICIAIS;
+        }
+
+        function atualizarDisplayUsos() {
+            const usos = getUsosRestantes();
+            const display = document.getElementById('usosRestantesDisplay');
+            const badge = document.getElementById('badgeUsos');
+
+            if (display) display.textContent = usos;
+
+            if (badge) {
+                badge.classList.remove('bloqueado', 'alerta');
+                if (usos <= 0) {
+                    badge.classList.add('bloqueado');
+                } else if (usos <= 3) {
+                    badge.classList.add('alerta');
+                }
+            }
+        }
+
+        function verificarBloqueio() {
+            const usos = getUsosRestantes();
+            const modal = document.getElementById('modalBloqueio');
+
+            if (usos <= 0 && modal) {
+                modal.classList.add('active');
+                return true;
+            }
+            return false;
+        }
+
+        function decrementarUso() {
+            if (verificarBloqueio()) {
+                showToast('❌ Limite de uso atingido! Insira a senha para resetar.', 'error');
+                return false;
+            }
+
+            const usos = getUsosRestantes();
+            const novoUsos = usos - 1;
+            localStorage.setItem(STORAGE_KEY_LICENCA, JSON.stringify({ usosRestantes: novoUsos }));
+            atualizarDisplayUsos();
+
+            if (novoUsos <= 0) {
+                verificarBloqueio();
+            }
+
+            return true;
+        }
+
+        function resetarLicenca() {
+            const senha = document.getElementById('senhaReset').value;
+
+            if (senha === SENHA_RESET) {
+                localStorage.setItem(STORAGE_KEY_LICENCA, JSON.stringify({ usosRestantes: USOS_INICIAIS }));
+                atualizarDisplayUsos();
+                document.getElementById('modalBloqueio').classList.remove('active');
+                document.getElementById('senhaReset').value = '';
+                showToast('✅ Licença resetada! ' + USOS_INICIAIS + ' usos disponíveis.', 'success');
+            } else {
+                showToast('❌ Senha incorreta!', 'error');
+            }
+        }
+
+        function mostrarInfoLicenca() {
+            const usos = getUsosRestantes();
+            if (usos <= 3 && usos > 0) {
+                showToast('⚠️ Atenção: ' + usos + ' uso(s) restante(s)!', 'warning');
+            } else if (usos <= 0) {
+                showToast('❌ Sistema bloqueado! Insira a senha para resetar.', 'error');
+            }
+        }
+
+        function formatMoney(value) {
+            if (isNaN(value) || value === null) return 'R$ 0,00';
+            return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideOut 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards'; setTimeout(() => toast.remove(), 400); }, 3000);
+        }
+
+        document.getElementById('modalPDF').addEventListener('click', function(e) {
+            if (e.target === this) fecharModalPDF();
+        });
+    </script>
+
+    <!-- MODAL BLOQUEIO -->
+    <div id="modalBloqueio" class="modal-bloqueio">
+        <i class="fas fa-lock"></i>
+        <h2>Sistema Bloqueado</h2>
+        <p>Limite de uso atingido. Para continuar usando o sistema, insira a senha de administrador.</p>
+        <div class="reset-section">
+            <input type="password" id="senhaReset" placeholder="Senha administrador" onkeypress="if(event.key==='Enter')resetarLicenca()"/>
+            <button class="btn btn-primary" onclick="resetarLicenca()" style="width:100%;">
+                <i class="fas fa-unlock"></i> Liberar Sistema
+            </button>
+        </div>
+    </div>
+</body>
+</html>

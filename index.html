@@ -3,17 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lord Profit v14 | Em atualização</title>
+  <meta name="description" content="Lord Profit v14 - Precificação inteligente para marketplaces">
+  <title>Lord Profit v14 | Precificação Inteligente</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #050508; color: #f8fafc; font-family: Inter, system-ui, sans-serif; }
-    main { max-width: 680px; padding: 32px; text-align: center; }
-    h1 { color: #06b6d4; }
+    :root{--bg:#050508;--card:#13131c;--border:rgba(255,255,255,.09);--text:#f8fafc;--muted:#94a3b8;--cyan:#06b6d4;--purple:#8b5cf6;--pink:#ec4899;--green:#10b981;--danger:#ef4444}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,sans-serif;background:radial-gradient(circle at 15% 20%,rgba(6,182,212,.12),transparent 35%),radial-gradient(circle at 85% 30%,rgba(139,92,246,.12),transparent 35%),var(--bg);color:var(--text);min-height:100vh}.app{max-width:1180px;margin:auto;padding:24px}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.header h1{margin:0;font-size:27px;background:linear-gradient(135deg,var(--cyan),var(--purple),var(--pink));-webkit-background-clip:text;color:transparent}.header p{margin:5px 0 0;color:var(--muted)}.platforms{display:flex;gap:8px}.platform{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:700}.platform.active{border-color:var(--cyan);box-shadow:0 0 18px rgba(6,182,212,.18)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:rgba(19,19,28,.92);border:1px solid var(--border);border-radius:16px;padding:18px}.card h2{margin:0 0 16px;font-size:17px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:12px}.field label{display:block;color:#cbd5e1;font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:6px}.field input,.field select{width:100%;border:1px solid var(--border);border-radius:9px;background:#09090e;color:var(--text);padding:12px;font-family:'JetBrains Mono',monospace}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.stat{border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;background:rgba(255,255,255,.02)}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase}.stat strong{display:block;margin-top:6px;font-size:20px;font-family:'JetBrains Mono',monospace}.cyan{color:var(--cyan)}.green{color:var(--green)}.danger{color:var(--danger)}.receipt{border:2px dashed var(--cyan);border-radius:14px;padding:18px;font-family:'JetBrains Mono',monospace}.receipt h3{text-align:center;color:var(--cyan);margin:0 0 14px}.line{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(255,255,255,.07);padding:8px 0;font-size:13px}.line.total{border-top:2px dashed var(--cyan);border-bottom:0;margin-top:12px;padding-top:14px;font-size:16px;font-weight:800}.final{margin-top:16px;padding:16px;border:2px solid var(--cyan);border-radius12px;text-align:center;background:rgba(6,182,212,.08)}.final strong{display:block;font-size28px;margin-top4px}.actions{display:flex;justify-content:flex-end;gap:10px;margin-bottom:16px}.btn{border:0;border-radius:10px;padding11px16px;color:#fff;background:var(--cyan);font-weight800;cursor:pointer}.btn.secondary{background:#242434}.chart{height260px;margin-top16px}.toast{position:fixed;right:20px;top:20px;padding12px18px;border-radius10px;background:var(--green);font-weight700}@media(max-width:800px){.grid,.row,.stats{grid-template-columns:1fr}.header{align-items:flex-start;gap12px}.platforms{flex-wrap:wrap}.header{flex-direction:column}.stats{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
-  <main>
-    <h1>Lord Profit v14</h1>
-    <p>O projeto está sendo publicado.</p>
-  </main>
+<div class="app">
+  <div class="header">
+    <div><h1>Lord Profit v14</h1><p>Precificação Inteligente</p></div>
+    <div class="platforms">
+      <button class="platform active" data-platform="Shopee">Shopee</button>
+      <button class="platform" data-platform="Mercado Livre">Mercado Livre</button>
+      <button class="platform" data-platform="TikTok Shop">TikTok Shop</button>
+    </div>
+  </div>
+  <div class="actions"><button class="btn secondary" id="limpar">Limpar</button><button class="btn" id="calcular"><i class="fa fa-bolt"></i> Calcular</button></div>
+  <div class="stats">
+    <div class="stat"><span>Preço de venda</span><strong class="cyan" id="preco">R$ 0,00</strong></div>
+    <div class="stat"><span>Lucro líquido</span><strong class="green" id="lucro">R$ 0,00</strong></div>
+    <div class="stat"><span>Margem</span><strong class="cyan" id="margem">0%</strong></div>
+    <div class="stat"><span>Break-even</span><strong id="breakeven">R$ 0,00</strong></div>
+  </div>
+  <div class="grid">
+    <section class="card">
+      <h2><i class="fa fa-sliders"></i> Dados do produto</h2>
+      <div class="field"><label>Nome ou SKU</label><input id="sku" value="PROD-001" placeholder="Código do produto"></div>
+      <div class="row">
+        <div class="field"><label>Custo (R$)</label><input id="custo" type="number" step="0.01" value="38"></div>
+        <div class="field"><label>Preço anunciado (R$)</label><input id="venda" type="number" step="0.01" value="129.90"></div>
+        <div class="field"><label>Embalagem (R$)</label><input id="embalagem" type="number" step="0.01" value="2"></div>
+        <div class="field"><label>Frete do vendedor (R$)</label><input id="frete" type="number" step="0.01" value="8"></div>
+        <div class="field"><label>Comissão (%)</label><input id="comissao" type="number" step="0.01" value="20"></div>
+        <div class="field"><label>Taxa fixa (R$)</label><input id="taxa" type="number" step="0.01" value="4.50"></div>
+        <div class="field"><label>Imposto (%)</label><input id="imposto" type="number" step="0.01" value="4"></div>
+        <div class="field"><label>Desconto cliente (%)</label><input id="desconto" type="number" step="0.01" value="10"></div>
+      </div>
+    </section>
+    <section class="card">
+      <h2><i class="fa fa-receipt"></i> Demonstrativo</h2>
+      <div class="receipt">
+        <h3 id="platNome">SHOPEE</h3>
+        <div class="line"><span>SKU</span><strong id="skuResumo">PROD-001</strong></div>
+        <div class="line"><span>Preço líquido</span><strong id="liquido">R$ 0,00</strong></div>
+        <div class="line"><span>Comissão</span><strong id="comissaoValor">R$ 0,00</strong></div>
+        <div class="line"><span>Taxa fixa</span><strong id="taxaValor">R$ 0,00</strong></div>
+        <div class="line"><span>Impostos</span><strong id="impostoValor">R$ 0,00</strong></div>
+        <div class="line"><span>Custos de mercadoria/logística</span><strong id="custosValor">R$ 0,00</strong></div>
+        <div class="line total"><span>LUCRO LÍQUIDO</span><strong id="lucroCupom">R$ 0,00</strong></div>
+      </div>
+      <div class="final"><span>Valor final do cliente</span><strong id="valorFinal">R$ 0,00</strong></div>
+    </section>
+  </div>
+  <section class="card chart"><canvas id="grafico"></canvas></section>
+</div>
+<script>
+let plataforma='Shopee', grafico;
+const money=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0);
+function calcular(){
+ const sku=document.getElementById('sku').value||'PROD-001', precoBase=Number(document.getElementById('venda').value)||0, desconto=(Number(document.getElementById('desconto').value)||0)/100;
+ const custo=Number(document.getElementById('custo').value)||0, embalagem=Number(document.getElementById('embalagem').value)||0, frete=Number(document.getElementById('frete').value)||0;
+ const pctComissao=(Number(document.getElementById('comissao').value)||0)/100, taxa=Number(document.getElementById('taxa').value)||0, pctImposto=(Number(document.getElementById('imposto').value)||0)/100;
+ let precoLiquido=precoBase*(1-desconto), comissao=precoLiquido*pctComissao, impostos=precoLiquido*pctImposto, custos=custo+embalagem+frete, lucro=precoLiquido-comissao-taxa-impostos-custos, margem=precoLiquido?lucro/precoLiquido*100:0;
+ let den=1-pctComissao-pctImposto, breakEven=den>0?(custos+taxa)/den:0;
+ document.getElementById('preco').textContent=money(precoLiquido);document.getElementById('lucro').textContent=money(lucro);document.getElementById('lucro').className=lucro>=0?'green':'danger';document.getElementById('margem').textContent=margem.toFixed(1)+'%';document.getElementById('breakeven').textContent=money(breakEven);
+ document.getElementById('skuResumo').textContent=sku;document.getElementById('liquido').textContent=money(precoLiquido);document.getElementById('comissaoValor').textContent='-'+money(comissao);document.getElementById('taxaValor').textContent='-'+money(taxa);document.getElementById('impostoValor').textContent='-'+money(impostos);document.getElementById('custosValor').textContent='-'+money(custos);document.getElementById('lucroCupom').textContent=money(lucro);document.getElementById('lucroCupom').style.color=lucro>=0?'#10b981':'#ef4444';document.getElementById('valorFinal').textContent=money(precoBase);
+ if(grafico){grafico.data.datasets[0].data=[Math.max(0,lucro),comissao,taxa,impostos,custos];grafico.update();}
+}
+document.querySelectorAll('.platform').forEach(b=>b.onclick=()=>{document.querySelectorAll('.platform').forEach(x=>x.classList.remove('active'));b.classList.add('active');plataforma=b.dataset.platform;document.getElementById('platNome').textContent=plataforma.toUpperCase();const conf={Shopee:[20,4.5],'Mercado Livre':[19,6.75],'TikTok Shop':[12,6]}[plataforma];document.getElementById('comissao').value=conf[0];document.getElementById('taxa').value=conf[1];calcular();});
+document.getElementById('calcular').onclick=calcular;document.getElementById('limpar').onclick=()=>{document.querySelectorAll('input').forEach(i=>i.value=i.id==='sku'?'PROD-001':'0');calcular();};document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calcular));
+window.addEventListener('DOMContentLoaded',()=>{if(window.Chart){grafico=new Chart(document.getElementById('grafico'),{type:'doughnut',data:{labels:['Lucro','Comissão','Taxa fixa','Impostos','Custos'],datasets:[{data:[0,0,0,0,0],backgroundColor:['#10b981','#06b6d4','#f59e0b','#ef4444','#8b5cf6']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#f8fafc'}}}}});}calcular();});
+</script>
 </body>
 </html>

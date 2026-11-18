@@ -1,7 +1,7 @@
 # Lord Profit v14
 
-Interface web de precificação e controle de produção para marketplaces.
+Aplicativo web de precificação para Shopee, Mercado Livre e TikTok Shop.
 
-## Uso
+## Acesso
 
-Acesse a versão publicada pelo GitHub Pages ou abra `index.html` diretamente em um navegador.
+https://diegolordelo16-netizen.github.io/Saas-LordePrice/
